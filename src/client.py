@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 
 from torch.utils.data import DataLoader
+from data.model_utils import generate_dataset
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +21,10 @@ class Client(object):
         device: Training machine indicator (e.g. "cpu", "cuda").
         __model: torch.nn instance as a local model.
     """
-    def __init__(self, client_id, local_data, device):
+    def __init__(self, client_id, local_data_path, device):
         """Client object is initiated by the center server."""
         self.id = client_id
-        self.data = local_data
+        self.train_data, self.test_data = generate_dataset(local_data_path, self.id)
         self.device = device
         self.__model = None
 
@@ -39,15 +40,17 @@ class Client(object):
 
     def __len__(self):
         """Return a total size of the client's local data."""
-        return len(self.data)
+        return len(self.train_data)
 
     def setup(self, **client_config):
         """Set up common configuration of each client; called by center server."""
-        self.dataloader = DataLoader(self.data, batch_size=client_config["batch_size"], shuffle=True)
+        self.dataloader = DataLoader(self.train_data, batch_size=client_config["batch_size"], shuffle=True)
+        self.test_dataloader = DataLoader(self.test_data, batch_size=client_config["batch_size"], shuffle=False)
         self.local_epoch = client_config["num_local_epochs"]
         self.criterion = client_config["criterion"]
         self.optimizer = client_config["optimizer"]
         self.optim_config = client_config["optim_config"]
+    
 
     def client_update(self):
         """Update local model using local dataset."""
@@ -76,7 +79,7 @@ class Client(object):
 
         test_loss, correct = 0, 0
         with torch.no_grad():
-            for data, labels in self.dataloader:
+            for data, labels in self.test_dataloader:
                 data, labels = data.float().to(self.device), labels.long().to(self.device)
                 outputs = self.model(data)
                 test_loss += eval(self.criterion)()(outputs, labels).item()
@@ -88,7 +91,7 @@ class Client(object):
         self.model.to("cpu")
 
         test_loss = test_loss / len(self.dataloader)
-        test_accuracy = correct / len(self.data)
+        test_accuracy = correct / len(self.train_data)
 
         message = f"\t[Client {str(self.id).zfill(4)}] ...finished evaluation!\
             \n\t=> Test loss: {test_loss:.4f}\

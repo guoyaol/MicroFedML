@@ -3,6 +3,8 @@ import numpy as np
 import os
 from collections import defaultdict
 
+import torch
+
 
 def batch_data(data, batch_size, seed):
     '''
@@ -46,7 +48,7 @@ def read_dir(data_dir):
     return clients, groups, data
 
 
-def read_data(train_data_dir, test_data_dir):
+def read_data(train_data_dir, test_data_dir, client_id=None):
     '''parses data in given train and test data directories
 
     assumes:
@@ -66,8 +68,38 @@ def read_data(train_data_dir, test_data_dir):
     assert train_clients == test_clients
     assert train_groups == test_groups
 
-    return train_clients, train_groups, train_data, test_data
+    if not client_id:
+        return train_clients, train_groups, train_data, test_data
+    else:
+        return train_data[str(client_id)], test_data[str(client_id)]
 
+class CustomDataset(torch.utils.data.Dataset):
+    'Characterizes a dataset for PyTorch'
+    def __init__(self, data):
+            'Initialization'
+            self.labels = data['y']
+            self.features = data['x']
+
+    def __len__(self):
+            'Denotes the total number of samples'
+            return len(self.labels)
+
+    def __getitem__(self, index):
+            'Generates one sample of data'
+            # Select sample
+            label = self.labels[index]
+            feature = self.features[index]
+
+            # Convert feature to tensor
+            feature_tensor = torch.tensor(feature, dtype=torch.float32)
+
+            return feature_tensor, label
+
+def generate_dataset(local_data_path, local_id):
+    train_data, test_data = read_data(local_data_path+'/train', local_data_path+'/test', local_id)
+    train_dataset = CustomDataset(train_data)
+    test_dataset = CustomDataset(test_data)
+    return train_dataset, test_dataset
 
 if __name__ == "__main__":
     train_clients, train_groups, train_data, test_data = read_data('./train', './test')

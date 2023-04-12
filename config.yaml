@@ -4,19 +4,20 @@ global_config:
   is_mp: True
 ---
 data_config:
-  data_path: "./data/"
+  data_path: "./data"
   dataset_name: "MNIST"
   num_shards: 200
   iid: False
 ---
 fed_config:
-  C: 0.1
-  K: 100
-  R: 500
-  E: 10
-  B: 10
+  C: 1.0  #fraction of clients
+  K: 7  #num_clients 
+  R: 500  #num_rounds
+  E: 10   #local_epochs
+  B: 3   #batch_size
   criterion: torch.nn.BCELoss
   optimizer: torch.optim.SGD
+  enable_test: False
 ---
 optim_config:
   lr: 0.01
@@ -33,11 +34,13 @@ model_config:
   #num_hiddens: 200
   #num_classes: 10
   
-  name: CNN
-  in_channels: 1
-  hidden_channels: 32
-  num_hiddens: 512
-  num_classes: 10
+  # name: CNN
+  # in_channels: 1
+  # hidden_channels: 32
+  # num_hiddens: 512
+  # num_classes: 10
+  name: LogisticRegression
+  input_dim: 3
 ---
 log_config:
   log_path: "./log/"

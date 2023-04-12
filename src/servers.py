@@ -73,6 +73,7 @@ class Server(object):
 
         self.criterion = fed_config["criterion"]
         self.optimizer = fed_config["optimizer"]
+        self.enable_test = fed_config["enable_test"]
         self.optim_config = optim_config
         
     def setup(self, **init_kwargs):
@@ -89,14 +90,17 @@ class Server(object):
         del message; gc.collect()
 
         # split local dataset for each client
-        local_datasets, test_dataset = create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
+        # now not used since we are letting clients read their own part of data
+        if self.enable_test:
+            local_datasets, test_dataset = create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
         
         # assign dataset to each client
-        self.clients = self.create_clients(local_datasets)
+        self.clients = self.create_clients()
 
         # prepare hold-out dataset for evaluation
-        self.data = test_dataset
-        self.dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
+        if self.enable_test:
+            self.data = test_dataset
+            self.dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
         
         # configure detailed settings for client upate and 
         self.setup_clients(
@@ -108,11 +112,11 @@ class Server(object):
         # send the model skeleton to all clients
         self.transmit_model()
         
-    def create_clients(self, local_datasets):
+    def create_clients(self, ):
         """Initialize each Client instance."""
         clients = []
-        for k, dataset in tqdm(enumerate(local_datasets), leave=False):
-            client = Client(client_id=k, local_data=dataset, device=self.device)
+        for k in tqdm(range(self.num_clients), leave=False):
+            client = Client(client_id=k, local_data_path = self.data_path, device=self.device)
             clients.append(client)
 
         message = f"[Round: {str(self._round).zfill(4)}] ...successfully created all {str(self.num_clients)} clients!"
@@ -294,25 +298,27 @@ class Server(object):
     def fit(self):
         """Execute the whole process of the federated learning."""
         self.results = {"loss": [], "accuracy": []}
+        test_loss, test_accuracy = 0, 0
         for r in range(self.num_rounds):
             self._round = r + 1
             
             self.train_federated_model()
-            test_loss, test_accuracy = self.evaluate_global_model()
+            if self.enable_test:
+                test_loss, test_accuracy = self.evaluate_global_model()
             
-            self.results['loss'].append(test_loss)
-            self.results['accuracy'].append(test_accuracy)
+                self.results['loss'].append(test_loss)
+                self.results['accuracy'].append(test_accuracy)
 
-            self.writer.add_scalars(
-                'Loss',
-                {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_loss},
-                self._round
-                )
-            self.writer.add_scalars(
-                'Accuracy', 
-                {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_accuracy},
-                self._round
-                )
+                self.writer.add_scalars(
+                    'Loss',
+                    {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_loss},
+                    self._round
+                    )
+                self.writer.add_scalars(
+                    'Accuracy', 
+                    {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_accuracy},
+                    self._round
+                    )
 
             message = f"[Round: {str(self._round).zfill(4)}] Evaluate global model's performance...!\
                 \n\t[Server] ...finished evaluation!\
