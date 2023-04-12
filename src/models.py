@@ -7,6 +7,19 @@ import torch.nn.functional as F
 #################################
 # Models for federated learning #
 #################################
+
+class LogisticRegression(nn.Module):
+    def __init__(self, input_dim):
+        super(LogisticRegression, self).__init__()
+        self.linear = nn.Linear(input_dim, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        out = self.linear(x)
+        out = self.sigmoid(out)
+        return out
+
+        
 # McMahan et al., 2016; 199,210 parameters
 class TwoNN(nn.Module):
     def __init__(self, name, in_features, num_hiddens, num_classes):

@@ -1,6 +1,6 @@
 global_config:
   seed: 5959
-  device: "cuda"
+  device: "cpu"
   is_mp: True
 ---
 data_config:
@@ -15,7 +15,7 @@ fed_config:
   R: 500
   E: 10
   B: 10
-  criterion: torch.nn.CrossEntropyLoss
+  criterion: torch.nn.BCELoss
   optimizer: torch.optim.SGD
 ---
 optim_config:
@@ -23,7 +23,7 @@ optim_config:
   momentum: 0.9
 ---
 init_config:
-  init_type: "xavier"
+  init_type: "normal"
   init_gain: 1.0
   gpu_ids: [0, 1, 2]
 ---
