@@ -1,6 +1,6 @@
 global_config:
   seed: 5959
-  device: "cuda"
+  device: "cpu"
   is_mp: True
 ---
 data_config:
@@ -25,7 +25,7 @@ optim_config:
 init_config:
   init_type: "xavier"
   init_gain: 1.0
-  gpu_ids: [0, 1, 2]
+  gpu_ids: []
 ---
 model_config: 
   #name: TwoNN
