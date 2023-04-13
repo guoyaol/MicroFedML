@@ -4,18 +4,18 @@ global_config:
   is_mp: True
 ---
 data_config:
-  data_path: "./src/data"
+  data_path: "./src/data/femnist_v1"
   dataset_name: "MNIST"
   num_shards: 200
   iid: False
 ---
 fed_config:
   C: 1.0  #fraction of clients
-  K: 7  #num_clients 
+  K: 10  #num_clients 
   R: 500  #num_rounds
   E: 10   #local_epochs
-  B: 3   #batch_size
-  criterion: torch.nn.BCELoss
+  B: 10   #batch_size
+  criterion: torch.nn.CrossEntropyLoss #BCELoss
   optimizer: torch.optim.SGD
   enable_test: False
 ---
@@ -29,18 +29,18 @@ init_config:
   gpu_ids: []
 ---
 model_config: 
-  #name: TwoNN
-  #in_features: 784
-  #num_hiddens: 200
-  #num_classes: 10
+  name: TwoNN
+  in_features: 784
+  num_hiddens: 200
+  num_classes: 64
   
   # name: CNN
   # in_channels: 1
   # hidden_channels: 32
   # num_hiddens: 512
   # num_classes: 10
-  name: LogisticRegression
-  input_dim: 3
+  # name: LogisticRegression
+  # input_dim: 3
 ---
 log_config:
   log_path: "./log/"

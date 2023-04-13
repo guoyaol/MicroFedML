@@ -11,8 +11,10 @@ import torch.nn.functional as F
 class LogisticRegression(nn.Module):
     def __init__(self, name, input_dim):
         super(LogisticRegression, self).__init__()
+        self.name = name
         self.linear = nn.Linear(input_dim, 1)
         self.sigmoid = nn.Sigmoid()
+        self.out_dim = 1
 
     def forward(self, x):
         out = self.linear(x)
@@ -26,6 +28,7 @@ class TwoNN(nn.Module):
         super(TwoNN, self).__init__()
         self.name = name
         self.activation = nn.ReLU(True)
+        self.out_dim = num_classes
 
         self.fc1 = nn.Linear(in_features=in_features, out_features=num_hiddens, bias=True)
         self.fc2 = nn.Linear(in_features=num_hiddens, out_features=num_hiddens, bias=True)
@@ -45,6 +48,7 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
         self.name = name
         self.activation = nn.ReLU(True)
+        self.out_dim = num_classes
 
         self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=hidden_channels, kernel_size=(5, 5), padding=1, stride=1, bias=False)
         self.conv2 = nn.Conv2d(in_channels=hidden_channels, out_channels=hidden_channels * 2, kernel_size=(5, 5), padding=1, stride=1, bias=False)

@@ -64,7 +64,6 @@ def read_data(train_data_dir, test_data_dir, client_id):
     '''
     train_clients, train_groups, train_data = read_dir(train_data_dir)
     test_clients, test_groups, test_data = read_dir(test_data_dir)
-
     assert train_clients == test_clients
     assert train_groups == test_groups
 
@@ -102,5 +101,6 @@ def generate_dataset(local_data_path, local_id):
     return train_dataset, test_dataset
 
 if __name__ == "__main__":
-    train_clients, train_groups, train_data, test_data = read_data('./train', './test')
+    # train_clients, train_groups, train_data, test_data = read_data('./femnist_v1/train', './femnist_v1/test', 0)
+    train_data, test_data = read_data('./femnist_v1/train', './femnist_v1/test', 0)
     from IPython import embed; embed()
