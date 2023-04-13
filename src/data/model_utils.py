@@ -48,7 +48,7 @@ def read_dir(data_dir):
     return clients, groups, data
 
 
-def read_data(train_data_dir, test_data_dir, client_id=None):
+def read_data(train_data_dir, test_data_dir, client_id):
     '''parses data in given train and test data directories
 
     assumes:
@@ -68,10 +68,10 @@ def read_data(train_data_dir, test_data_dir, client_id=None):
     assert train_clients == test_clients
     assert train_groups == test_groups
 
-    if not client_id:
-        return train_clients, train_groups, train_data, test_data
-    else:
-        return train_data[str(client_id)], test_data[str(client_id)]
+    # if not client_id:
+    #     return train_clients, train_groups, train_data, test_data
+    # else:
+    return train_data[str(client_id)], test_data[str(client_id)]
 
 class CustomDataset(torch.utils.data.Dataset):
     'Characterizes a dataset for PyTorch'
@@ -96,7 +96,7 @@ class CustomDataset(torch.utils.data.Dataset):
             return feature_tensor, label
 
 def generate_dataset(local_data_path, local_id):
-    train_data, test_data = read_data(local_data_path+'/train', local_data_path+'/test', local_id)
+    train_data, test_data = read_data(local_data_path+'/train', local_data_path+'/test', client_id=local_id)
     train_dataset = CustomDataset(train_data)
     test_dataset = CustomDataset(test_data)
     return train_dataset, test_dataset

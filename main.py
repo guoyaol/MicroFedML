@@ -9,7 +9,7 @@ import logging
 import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
 
-from src.server import Server
+from src.servers import Server
 from src.utils import launch_tensor_board
 
 

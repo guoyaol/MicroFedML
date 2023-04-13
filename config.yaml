@@ -4,7 +4,7 @@ global_config:
   is_mp: True
 ---
 data_config:
-  data_path: "./data"
+  data_path: "./src/data"
   dataset_name: "MNIST"
   num_shards: 200
   iid: False
@@ -26,7 +26,7 @@ optim_config:
 init_config:
   init_type: "normal"
   init_gain: 1.0
-  gpu_ids: [0, 1, 2]
+  gpu_ids: []
 ---
 model_config: 
   #name: TwoNN
