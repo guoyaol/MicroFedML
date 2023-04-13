@@ -42,9 +42,16 @@ def read_dir(data_dir):
         clients.extend(cdata['users'])
         if 'hierarchies' in cdata:
             groups.extend(cdata['hierarchies'])
+
+        # for user, data_xy in data.items():
+        #     for k in data_xy.keys():
+        #         # print(user, k, type(data[user][k]), type(cdata['user_data'][user][k]))
+        #         data[user][k].extend(cdata['user_data'][user][k])
         data.update(cdata['user_data'])
 
     clients = list(sorted(data.keys()))
+    # from IPython import embed; embed()
+    
     return clients, groups, data
 
 
@@ -103,4 +110,4 @@ def generate_dataset(local_data_path, local_id):
 if __name__ == "__main__":
     # train_clients, train_groups, train_data, test_data = read_data('./femnist_v1/train', './femnist_v1/test', 0)
     train_data, test_data = read_data('./femnist_v1/train', './femnist_v1/test', 0)
-    from IPython import embed; embed()
+    

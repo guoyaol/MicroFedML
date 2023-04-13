@@ -61,6 +61,7 @@ class Client(object):
         for e in range(self.local_epoch):
             for data, labels in self.dataloader:
                 data, labels = data.float().to(self.device), labels.long().to(self.device)
+                data = data.view([-1, 1, 28, 28])
                 # labels = labels.view(-1, 1).float()
   
                 optimizer.zero_grad()
@@ -82,6 +83,7 @@ class Client(object):
         with torch.no_grad():
             for data, labels in self.test_dataloader:
                 data, labels = data.float().to(self.device), labels.long().to(self.device)
+                data = data.view([-1, 1, 28, 28])
                 # labels = labels.view(-1, 1).float()
                 outputs = self.model(data)
                 test_loss += eval(self.criterion)()(outputs, labels).item()

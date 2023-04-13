@@ -14,14 +14,14 @@ fed_config:
   K: 10  #num_clients 
   R: 500  #num_rounds
   E: 10   #local_epochs
-  B: 10   #batch_size
+  B: 64   #batch_size
   criterion: torch.nn.CrossEntropyLoss #BCELoss
   optimizer: torch.optim.SGD
   enable_test: False
 ---
 optim_config:
   lr: 0.01
-  momentum: 0.9
+  momentum: 0.009
 ---
 init_config:
   init_type: "normal"
@@ -29,16 +29,17 @@ init_config:
   gpu_ids: []
 ---
 model_config: 
-  name: TwoNN
-  in_features: 784
-  num_hiddens: 200
-  num_classes: 64
+  # name: TwoNN
+  # in_features: 784
+  # num_hiddens: 200
+  # num_classes: 64
   
-  # name: CNN
-  # in_channels: 1
-  # hidden_channels: 32
-  # num_hiddens: 512
-  # num_classes: 10
+  name: CNN
+  in_channels: 1
+  hidden_channels: 32
+  num_hiddens: 512
+  num_classes: 64
+
   # name: LogisticRegression
   # input_dim: 3
 ---
