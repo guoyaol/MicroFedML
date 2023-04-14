@@ -24,10 +24,10 @@ class Client(object):
     #create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
     def __init__(self, client_id, local_datapath, device, dataset_name, num_clients, num_shards, iid):
         """Client object is initiated by the center server."""
-        local_datasets, _ = create_datasets(local_datapath, dataset_name, num_clients, num_shards, iid)
+        local_datasets, test_datasets = create_datasets(local_datapath, dataset_name, num_clients, num_shards, iid)
 
         self.id = client_id
-        self.data = local_datasets[client_id]
+        self.train_data = local_datasets[client_id]
         self.device = device
         self.__model = None
 
@@ -49,11 +49,11 @@ class Client(object):
 
     def __len__(self):
         """Return a total size of the client's local data."""
-        return len(self.data)
+        return len(self.train_data)
 
     def setup(self, **client_config):
         """Set up common configuration of each client; called by center server."""
-        self.dataloader = DataLoader(self.data, batch_size=client_config["batch_size"], shuffle=True)
+        self.train_dataloader = DataLoader(self.train_data, batch_size=client_config["batch_size"], shuffle=True)
         self.local_epoch = client_config["num_local_epochs"]
         self.criterion = client_config["criterion"]
         self.optimizer = client_config["optimizer"]
@@ -66,7 +66,7 @@ class Client(object):
 
         optimizer = eval(self.optimizer)(self.model.parameters(), **self.optim_config)
         for e in range(self.local_epoch):
-            for data, labels in self.dataloader:
+            for data, labels in self.train_dataloader:
                 data, labels = data.float().to(self.device), labels.long().to(self.device)
   
                 optimizer.zero_grad()
@@ -86,7 +86,7 @@ class Client(object):
 
         test_loss, correct = 0, 0
         with torch.no_grad():
-            for data, labels in self.dataloader:
+            for data, labels in self.train_dataloader:
                 data, labels = data.float().to(self.device), labels.long().to(self.device)
                 outputs = self.model(data)
                 test_loss += eval(self.criterion)()(outputs, labels).item()
@@ -97,8 +97,8 @@ class Client(object):
                 if self.device == "cuda": torch.cuda.empty_cache()
         self.model.to("cpu")
 
-        test_loss = test_loss / len(self.dataloader)
-        test_accuracy = correct / len(self.data)
+        test_loss = test_loss / len(self.train_dataloader)
+        test_accuracy = correct / len(self.train_data)
 
         message = f"\t[Client {str(self.id).zfill(4)}] ...finished evaluation!\
             \n\t=> Test loss: {test_loss:.4f}\
