@@ -134,9 +134,11 @@ def create_datasets(data_path, dataset_name, num_clients, num_shards, iid):
         raise AttributeError(error_message)
     
     local_datasets = split_dataset(training_dataset, transform, num_clients, num_shards, iid)
+    local_test_datasets = split_dataset(test_dataset, transform, num_clients, num_shards, iid)
 
 
-    return local_datasets, test_dataset
+
+    return local_datasets, test_dataset, local_test_datasets
 
 def split_dataset(training_dataset, transform, num_clients, num_shards, iid):
     # unsqueeze channel dimension for grayscale image datasets

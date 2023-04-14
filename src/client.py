@@ -24,10 +24,11 @@ class Client(object):
     #create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
     def __init__(self, client_id, local_datapath, device, dataset_name, num_clients, num_shards, iid):
         """Client object is initiated by the center server."""
-        local_datasets, test_datasets = create_datasets(local_datapath, dataset_name, num_clients, num_shards, iid)
+        local_datasets, _, local_test_datasets = create_datasets(local_datapath, dataset_name, num_clients, num_shards, iid)
 
         self.id = client_id
         self.train_data = local_datasets[client_id]
+        self.test_data = local_test_datasets[client_id]
         self.device = device
         self.__model = None
 
@@ -54,6 +55,7 @@ class Client(object):
     def setup(self, **client_config):
         """Set up common configuration of each client; called by center server."""
         self.train_dataloader = DataLoader(self.train_data, batch_size=client_config["batch_size"], shuffle=True)
+        self.test_dataloader = DataLoader(self.test_data, batch_size=client_config["batch_size"], shuffle=False)
         self.local_epoch = client_config["num_local_epochs"]
         self.criterion = client_config["criterion"]
         self.optimizer = client_config["optimizer"]
@@ -101,8 +103,37 @@ class Client(object):
         test_accuracy = correct / len(self.train_data)
 
         message = f"\t[Client {str(self.id).zfill(4)}] ...finished evaluation!\
-            \n\t=> Test loss: {test_loss:.4f}\
-            \n\t=> Test accuracy: {100. * test_accuracy:.2f}%\n"
+            \n\t=> client loss(train): {test_loss:.4f}\
+            \n\t=> client accuracy(train): {100. * test_accuracy:.2f}%\n"
+        print(message, flush=True); logging.info(message)
+        del message; gc.collect()
+
+        return test_loss, test_accuracy
+
+    def client_evaluate_test(self):
+        """Evaluate local model using local test dataset."""
+        self.model.eval()
+        self.model.to(self.device)
+
+        test_loss, correct = 0, 0
+        with torch.no_grad():
+            for data, labels in self.test_dataloader:
+                data, labels = data.float().to(self.device), labels.long().to(self.device)
+                outputs = self.model(data)
+                test_loss += eval(self.criterion)()(outputs, labels).item()
+                
+                predicted = outputs.argmax(dim=1, keepdim=True)
+                correct += predicted.eq(labels.view_as(predicted)).sum().item()
+
+                if self.device == "cuda": torch.cuda.empty_cache()
+        self.model.to("cpu")
+
+        test_loss = test_loss / len(self.test_dataloader)
+        test_accuracy = correct / len(self.test_data)
+
+        message = f"\t[Client {str(self.id).zfill(4)}] ...finished evaluation!\
+            \n\t=> client loss(test): {test_loss:.4f}\
+            \n\t=> client accuracy(test): {100. * test_accuracy:.2f}%\n"
         print(message, flush=True); logging.info(message)
         del message; gc.collect()
 

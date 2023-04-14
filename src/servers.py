@@ -89,7 +89,7 @@ class Server(object):
         del message; gc.collect()
 
         # split local dataset for each client
-        _, test_dataset = create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
+        _, test_dataset, _ = create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
         
         # assign dataset to each client
         #self.clients = self.create_clients(local_datasets)
@@ -231,6 +231,7 @@ class Server(object):
 
         for idx in sampled_client_indices:
             self.clients[idx].client_evaluate_train()
+            self.clients[idx].client_evaluate_test()
 
         message = f"[Round: {str(self._round).zfill(4)}] ...finished evaluation of {str(len(sampled_client_indices))} selected clients!"
         print(message); logging.info(message)
@@ -239,6 +240,7 @@ class Server(object):
     def mp_evaluate_selected_models(self, selected_index):
         """Multiprocessing-applied version of "evaluate_selected_models" method."""
         self.clients[selected_index].client_evaluate_train()
+        self.clients[selected_index].client_evaluate_test()
         return True
 
     def train_federated_model(self):
