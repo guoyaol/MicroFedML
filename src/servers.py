@@ -48,7 +48,7 @@ class Server(object):
         optim_config: Kwargs provided for optimizer.
     """
     def __init__(self, writer, model_config={}, global_config={}, data_config={}, init_config={}, fed_config={}, optim_config={}):
-        self.clients = None
+        self.clients = []
         self._round = 0
         self.writer = writer
 
@@ -89,10 +89,15 @@ class Server(object):
         del message; gc.collect()
 
         # split local dataset for each client
-        local_datasets, test_dataset = create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
+        _, test_dataset = create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
         
         # assign dataset to each client
-        self.clients = self.create_clients(local_datasets)
+        #self.clients = self.create_clients(local_datasets)
+        for k in range(self.num_clients):
+            current_client = Client(client_id=k, local_datapath=self.data_path, device=self.device, \
+                                    dataset_name = self.dataset_name, num_clients = self.num_clients, \
+                                        num_shards = self.num_shards, iid = self.iid)
+            self.clients.append(current_client)
 
         # prepare hold-out dataset for evaluation
         self.data = test_dataset
@@ -108,17 +113,17 @@ class Server(object):
         # send the model skeleton to all clients
         self.transmit_model()
         
-    def create_clients(self, local_datasets):
-        """Initialize each Client instance."""
-        clients = []
-        for k, dataset in tqdm(enumerate(local_datasets), leave=False):
-            client = Client(client_id=k, local_data=dataset, device=self.device)
-            clients.append(client)
+    # def create_clients(self, local_datasets):
+    #     """Initialize each Client instance."""
+    #     clients = []
+    #     for k, dataset in tqdm(enumerate(local_datasets), leave=False):
+    #         client = Client(client_id=k, local_data=dataset, device=self.device)
+    #         clients.append(client)
 
-        message = f"[Round: {str(self._round).zfill(4)}] ...successfully created all {str(self.num_clients)} clients!"
-        print(message); logging.info(message)
-        del message; gc.collect()
-        return clients
+    #     message = f"[Round: {str(self._round).zfill(4)}] ...successfully created all {str(self.num_clients)} clients!"
+    #     print(message); logging.info(message)
+    #     del message; gc.collect()
+    #     return clients
 
     def setup_clients(self, **client_config):
         """Set up each client."""

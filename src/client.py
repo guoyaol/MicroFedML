@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 
 from torch.utils.data import DataLoader
+from .utils import create_datasets
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +21,21 @@ class Client(object):
         device: Training machine indicator (e.g. "cpu", "cuda").
         __model: torch.nn instance as a local model.
     """
-    def __init__(self, client_id, local_data, device):
+    #create_datasets(self.data_path, self.dataset_name, self.num_clients, self.num_shards, self.iid)
+    def __init__(self, client_id, local_datapath, device, dataset_name, num_clients, num_shards, iid):
         """Client object is initiated by the center server."""
+        local_datasets, _ = create_datasets(local_datapath, dataset_name, num_clients, num_shards, iid)
+
         self.id = client_id
-        self.data = local_data
+        self.data = local_datasets[client_id]
         self.device = device
         self.__model = None
+
+    def read_data(id, data_path):
+        """Read local data from pickle file."""
+        with open(data_path, "rb") as f:
+            data = pickle.load(f)
+        return data[id]
 
     @property
     def model(self):
