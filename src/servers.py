@@ -230,7 +230,7 @@ class Server(object):
         del message; gc.collect()
 
         for idx in sampled_client_indices:
-            self.clients[idx].client_evaluate()
+            self.clients[idx].client_evaluate_train()
 
         message = f"[Round: {str(self._round).zfill(4)}] ...finished evaluation of {str(len(sampled_client_indices))} selected clients!"
         print(message); logging.info(message)
@@ -238,7 +238,7 @@ class Server(object):
 
     def mp_evaluate_selected_models(self, selected_index):
         """Multiprocessing-applied version of "evaluate_selected_models" method."""
-        self.clients[selected_index].client_evaluate()
+        self.clients[selected_index].client_evaluate_train()
         return True
 
     def train_federated_model(self):
