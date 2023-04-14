@@ -305,26 +305,26 @@ class Server(object):
             self._round = r + 1
             
             self.train_federated_model()
-            test_loss, test_accuracy = self.evaluate_global_model()
+            # test_loss, test_accuracy = self.evaluate_global_model()
             
-            self.results['loss'].append(test_loss)
-            self.results['accuracy'].append(test_accuracy)
+            # self.results['loss'].append(test_loss)
+            # self.results['accuracy'].append(test_accuracy)
 
-            self.writer.add_scalars(
-                'Loss',
-                {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_loss},
-                self._round
-                )
-            self.writer.add_scalars(
-                'Accuracy', 
-                {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_accuracy},
-                self._round
-                )
+            # self.writer.add_scalars(
+            #     'Loss',
+            #     {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_loss},
+            #     self._round
+            #     )
+            # self.writer.add_scalars(
+            #     'Accuracy', 
+            #     {f"[{self.dataset_name}]_{self.model.name} C_{self.fraction}, E_{self.local_epochs}, B_{self.batch_size}, IID_{self.iid}": test_accuracy},
+            #     self._round
+            #     )
 
-            message = f"[Round: {str(self._round).zfill(4)}] Evaluate global model's performance...!\
-                \n\t[Server] ...finished evaluation!\
-                \n\t=> Loss: {test_loss:.4f}\
-                \n\t=> Accuracy: {100. * test_accuracy:.2f}%\n"            
-            print(message); logging.info(message)
-            del message; gc.collect()
+            # message = f"[Round: {str(self._round).zfill(4)}] Evaluate global model's performance...!\
+            #     \n\t[Server] ...finished evaluation!\
+            #     \n\t=> Loss: {test_loss:.4f}\
+            #     \n\t=> Accuracy: {100. * test_accuracy:.2f}%\n"            
+            # print(message); logging.info(message)
+            # del message; gc.collect()
         self.transmit_model()
