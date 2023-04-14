@@ -132,7 +132,13 @@ def create_datasets(data_path, dataset_name, num_clients, num_shards, iid):
         # dataset not found exception
         error_message = f"...dataset \"{dataset_name}\" is not supported or cannot be found in TorchVision Datasets!"
         raise AttributeError(error_message)
+    
+    local_datasets = split_dataset(training_dataset, transform, num_clients, num_shards, iid)
 
+
+    return local_datasets, test_dataset
+
+def split_dataset(training_dataset, transform, num_clients, num_shards, iid):
     # unsqueeze channel dimension for grayscale image datasets
     if training_dataset.data.ndim == 3: # convert to NxHxW -> NxHxWx1
         training_dataset.data.unsqueeze_(3)
@@ -194,4 +200,4 @@ def create_datasets(data_path, dataset_name, num_clients, num_shards, iid):
             ) 
             for i in range(0, len(shard_inputs_sorted), shards_per_clients)
         ]
-    return local_datasets, test_dataset
+    return local_datasets
