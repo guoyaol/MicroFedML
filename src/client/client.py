@@ -1,4 +1,7 @@
- import time
+import socket
+import os
+import sys
+import time
 
 class Client(object):
     """Class for client object having its own (private) data and resources to train a model.
@@ -12,19 +15,14 @@ class Client(object):
     """
     def __init__(self, client_id, server_address):
         self.id = client_id
-        self.model = 0
-        self.model_size = 100000
+        self.model = client_id % 10
+        self.model_size = 100
         self.server_address = server_address
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        try:
-            self.sock.connect(server_address)
-        except Exception as e:
-            print(f"Client {self.id} Cannot connect to the server,", e)
-            continue
+        
 
     def __del__(self):
-        self.sock.close()
+        pass
+        # self.sock.close()
 
     def setup(self, **client_config):
         pass
@@ -40,25 +38,33 @@ class Client(object):
         print(f"Client {self.id} done testing!")
     
     def marshall(self, model):
-        return str(model) * self.model_size
+        return (str(model) * self.model_size).encode('utf-8')
 
     def unmarshall(self, blob):
-        return int(blob[0])
+        return blob.decode('utf-8')
 
-    def get_param_from_server():
+    def get_param_from_server(self):
         print(f"Client {self.id} start receiving!")
         amount_received = 0
         amount_expected = self.model_size
 
         while amount_received < amount_expected:
-            data = sock.recv(64)
+            data = self.unmarshall(self.sock.recv(64))
             amount_received += len(data)
-        self.model = self.unmarshall(data)
+        self.model = int(data[0])
+        self.sock.close()
         print(f"Client {self.id} done receiving!")
 
-    def send_param_to_server():
+    def send_param_to_server(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        try:
+            self.sock.connect(self.server_address)
+        except Exception as e:
+            print(f"Client {self.id} Cannot connect to the server,", e)
         print(f"Client {self.id} start sending!")
         msg = self.marshall(self.model)
         self.sock.sendall(msg)
+        
         print(f"Client {self.id} done sending!")
     
