@@ -16,7 +16,7 @@ class Server(object):
     def __init__(self, ):
         self.clients = []
         self.clients_values = {}
-        self.model_size = 1000
+        self.model_size = 10000000
         
     def __del__(self):
         # for connection, client_address in self.clients:
@@ -48,19 +48,28 @@ class Server(object):
         
     def receiving_model_from_connection(self, conn, client_address):
         print(f'Receiving model from the client {client_address} start!')
-        conn.settimeout(2)
+        # conn.settimeout(2)
         received = ""
-        while True:
-            try:
-                data = conn.recv(64)
-                if len(data) > 0:
-                    received += self.unmarshall(data)
-                    print(received)
-                else:
-                    break
-            except Exception as e:
-                break
+        # while True:
+        #     try:
+        #         data = conn.recv(64)
+        #         if len(data) > 0:
+        #             received += self.unmarshall(data)
+                    
+        #         else:
+        #             break
+        #     except Exception as e:
+        #         break
+        amount_received = 0
+        amount_expected = self.model_size
+
+        while amount_received < amount_expected:
+            data = self.unmarshall(conn.recv(64))
+            if len(data) > 0:
+                received += data
+            amount_received += len(data)
         model = received[0]
+        print(received[0])
         self.clients_values[client_address] = model
         self.clients.append((conn, client_address))
         print(f'Receiving model from the client {client_address} done!')

@@ -16,7 +16,7 @@ class Client(object):
     def __init__(self, client_id, server_address):
         self.id = client_id
         self.model = client_id % 10
-        self.model_size = 1000
+        self.model_size = 10000000
         self.server_address = server_address
         
 
