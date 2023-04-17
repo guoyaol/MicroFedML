@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: client
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
       - name: client
-        image: "docker.io/liugztat/q69936079-client:latest"
+        image: "docker.io/liugztat/q6993607-client:latest"
+        imagePullPolicy: Always # add this line
         env:
         - name: PYTHONUNBUFFERED
           value: "1"

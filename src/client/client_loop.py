@@ -5,8 +5,8 @@ import time
 from client import Client
 counter = 0
 
-SRV = "127.0.0.1"#os.getenv('SERVER_ADDRESS')
-PORT = 13333#int(os.getenv('SERVER_PORT'))
+SRV = os.getenv('SERVER_ADDRESS') #'0.0.0.0'#
+PORT = int(os.getenv('SERVER_PORT')) #13333#
 
 cli_id = 1
 server_address = (SRV, PORT)

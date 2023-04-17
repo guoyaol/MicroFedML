@@ -16,7 +16,7 @@ class Client(object):
     def __init__(self, client_id, server_address):
         self.id = client_id
         self.model = client_id % 10
-        self.model_size = 100
+        self.model_size = 1000
         self.server_address = server_address
         
 
@@ -57,11 +57,13 @@ class Client(object):
 
     def send_param_to_server(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        try:
-            self.sock.connect(self.server_address)
-        except Exception as e:
-            print(f"Client {self.id} Cannot connect to the server,", e)
+        while 1:
+            try:
+                self.sock.connect(self.server_address)
+                break
+            except Exception as e:
+                print(f"Client {self.id} Cannot connect to the server,", e)
+                 
         print(f"Client {self.id} start sending!")
         msg = self.marshall(self.model)
         self.sock.sendall(msg)

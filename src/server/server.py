@@ -16,7 +16,7 @@ class Server(object):
     def __init__(self, ):
         self.clients = []
         self.clients_values = {}
-        self.model_size = 100
+        self.model_size = 1000
         
     def __del__(self):
         # for connection, client_address in self.clients:

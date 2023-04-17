@@ -3,7 +3,7 @@ import sys
 import os
 from server import Server
 
-PORT = 13333#int(os.getenv('LISTEN_PORT'))
+PORT = int(os.getenv('LISTEN_PORT')) #13333#
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_address = ('0.0.0.0', PORT)
