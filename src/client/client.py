@@ -1,7 +1,8 @@
 import socket
 import os
 import sys
-import time
+import 
+from confluent_kafka import Producer
 
 class Client(object):
     """Class for client object having its own (private) data and resources to train a model.
@@ -13,12 +14,20 @@ class Client(object):
         device: Training machine indicator (e.g. "cpu", "cuda").
         __model: torch.nn instance as a local model.
     """
-    def __init__(self, client_id, server_address):
+    def __init__(self, client_id, server_address, serverless = False):
         self.id = client_id
         self.model = client_id % 10
         self.model_size = 10000000
         self.server_address = server_address
         
+        
+        if serverless:
+            # Define the topic to send messages to
+
+            # Define the configuration for the Kafka producer
+            conf = {"bootstrap.servers": "kafka-service.kafka:9092",}
+            self.partitions = 5
+            self.producer = Producer(conf)
 
     def __del__(self):
         pass
@@ -70,3 +79,41 @@ class Client(object):
         
         print(f"Client {self.id} done sending!")
     
+    def send_param_to_kafka(self):
+
+        # Create a large random Torch tensor
+        # large_tensor = torch.randn(1000, 1000)
+        print(f"Client {self.id} start sending to kafka!")
+        msg = self.marshall(self.model)
+        partition_size = len(msg) // self.partitions
+        # Convert the tensor to a JSON string
+        # tensor_str = json.dumps(large_tensor.numpy().tolist())
+
+        # Send the message to the Kafka topic
+        for i in range(self.partitions):
+            start = i * partition_size
+            end = start + partition_size
+            if i == self.partitions - 1:
+                end = len(msg)
+            self.producer.produce(topic=f"partition_{i}", key=f"Client {self.id}", value=msg[start:end])
+
+        # Wait for any outstanding messages to be delivered and delivery reports received
+        producer.flush()
+        print(f"Client {self.id} done sending to kafka!")
+
+    # def get_param_from_kafka(self):
+
+    #     # Create a large random Torch tensor
+    #     # large_tensor = torch.randn(1000, 1000)
+    #     print(f"Client {self.id} start sending to kafka!")
+    #     msg = self.marshall(self.model)
+
+    #     # Convert the tensor to a JSON string
+    #     # tensor_str = json.dumps(large_tensor.numpy().tolist())
+
+    #     # Send the message to the Kafka topic
+    #     producer.produce(topic, key="my_key", value=msg)
+
+    #     # Wait for any outstanding messages to be delivered and delivery reports received
+    #     producer.flush()
+    #     print(f"Client {self.id} done sending to kafka!")
