@@ -1,10 +1,10 @@
 import socket
 import sys
 import os
-from confluent_kafka import Consumer, KafkaError
+from confluent_kafka import Consumer, KafkaError, TopicPartition
 
 
-class Server(object):
+class Serverless(object):
     """Class for implementing center server orchestrating the whole process of federated learning
     
     At first, center server distribute model skeleton to all participating clients with configurations.
@@ -20,13 +20,14 @@ class Server(object):
         self.partition_id = partition_id
 
         self.topic = f"partition_{partition_id}"
-        self.partition = 0  ##topic partition, not model
-        self.threshold = 3
+        self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
+        self.threshold = 1
 
         self.consumer_conf = {
             'bootstrap.servers': 'kafka-service.kafka:9092',
             'group.id': 'my_group',
-            'auto.offset.reset': 'earliest'
+            'auto.offset.reset': 'earliest',
+            "message.max.bytes": "10485880",
         }
 
         self.consumer = Consumer(self.consumer_conf)
@@ -47,7 +48,7 @@ class Server(object):
         return blob.decode('utf-8')
 
     def average_model(self, clients_values):
-        return clients_values
+        return clients_values[0]
 
     def transmit_model(self,):
         self.clients_values = self.average_model(self.clients_values)
@@ -59,9 +60,30 @@ class Server(object):
             # connection.close()
         self.clients = []
         self.clients_values = {}
+    
+    def receiving_model_from_kafka(self,):
+        try:
+            while True:
+                # Poll for new messages
+                msgs = consumer.consume(num_messages=self.threshold, timeout=1.0)
+
+                if not msgs:
+                    continue
+
+                # Extract the message values
+                messages = [msg.value().decode('utf-8') for msg in msgs]
+
+                # Process the messages if the threshold is reached
+                assert len(messages) >= self.threshold
+                model = self.average_model(messages)
+                print("Averaged model:", model)
+                # self.transmit_model()
+            
+        except KeyboardInterrupt:
+            pass
         
-    def checking_model_que_from_kafka(self, conn, client_address):
-        print(f'Receiving model from the client {client_address} start!')
+    def checking_model_que_from_kafka(self,):
+        print(f'Receiving model from kafka start!')
         # conn.settimeout(2)
         # received = ""
         # # while True:
@@ -86,10 +108,11 @@ class Server(object):
         # print(received[0])
         # self.clients_values[client_address] = model
         # self.clients.append((conn, client_address))
-        # print(f'Receiving model from the client {client_address} done!')
-
+        
+        # create a topic partition object
+        tp = TopicPartition(topic=self.topic, partition=self.topic_partition)
         # Get the current high watermark and last committed offset for the partition
-        watermark_offsets = self.consumer.get_watermark_offsets(topic, partition)
+        watermark_offsets = self.consumer.get_watermark_offsets(tp)
         high_watermark_offset = watermark_offsets.high
         last_committed_offset = watermark_offsets.offsets[0]
 
@@ -98,7 +121,9 @@ class Server(object):
 
         if unprocessed_messages >= self.threshold:
             # Trigger the function to consume messages
-            # ...
+            self.receiving_model_from_kafka()
+            print(f'Receiving model from kafka, aggegate and produce back done!')
         else:
             # Wait for more messages to be produced
-            # ...
+            print(f'current unprocessed_messages num: {unprocessed_messages}')
+            pass
