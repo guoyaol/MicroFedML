@@ -74,9 +74,9 @@ class Serverless(object):
         print(f"Server {self.shard_id}  done sending to kafka!")
     
     def receiving_model_from_kafka(self,):
-        print(f'Receiving model from kafka start!')
+        print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)} / {self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]}')
+        client_updates = []
         try:
-            
             # Poll for new messages
             while True:
                 # 
@@ -91,12 +91,15 @@ class Serverless(object):
                     continue
                 # self.offset += len(msgs)
                 # self.consumer.seek(self.consumer_tp, self.offset)
+                
                 msgs = msgs[self.consumer_tp]
+                client_updates.extend(msgs)
                 self.consumer.commit()
-                break
+                if len(client_updates) >= self.threshold:
+                    break
 
             # Extract the message values
-            messages = [msg.value.decode('utf-8') for msg in msgs]
+            messages = [msg.value.decode('utf-8') for msg in client_updates]
             
             # Process the messages if the threshold is reached
             assert len(messages) >= self.threshold
