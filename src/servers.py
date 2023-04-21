@@ -217,6 +217,11 @@ class Server(object):
                     averaged_weights[key] = coefficients[it] * local_weights[key]
                 else:
                     averaged_weights[key] += coefficients[it] * local_weights[key]
+
+        averaged_gradients_sketch, error = uncompress()
+        averaged_gradients = self.unmarshall(averaged_gradients_sketch)
+        self.error = error
+        self.model = averaged_gradients + self.model
         self.model.load_state_dict(averaged_weights)
 
         message = f"[Round: {str(self._round).zfill(4)}] ...updated weights of {len(sampled_client_indices)} clients are successfully averaged!"

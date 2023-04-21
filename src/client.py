@@ -31,6 +31,7 @@ class Client(object):
         self.test_data = local_test_datasets[client_id]
         self.device = device
         self.__model = None
+        self.model_tensor = None
 
     def read_data(id, data_path):
         """Read local data from pickle file."""
@@ -80,6 +81,7 @@ class Client(object):
 
                 if self.device == "cuda": torch.cuda.empty_cache()               
         self.model.to("cpu")
+        self.model_tensor =  self.compress(self.marshall(self.model))
 
     def client_evaluate_train(self):
         """Evaluate local model using local dataset (same as training set for convenience)."""
