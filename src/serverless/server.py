@@ -1,7 +1,7 @@
 import socket
 import sys
 import os
-from kafka import KafkaConsumer, TopicPartition
+from kafka import KafkaProducer, KafkaConsumer, TopicPartition
 
 
 class Serverless(object):
@@ -16,25 +16,34 @@ class Serverless(object):
     def __init__(self, shard_id):
         self.clients = []
         self.clients_values = {}
-        self.model_size = 10000000
+        self.model_size = 1000000
         self.shard_id = shard_id
 
-        self.topic = f"shard_{shard_id}"
+        self.consumer_topic = f"shard_{shard_id}"
         self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
-        self.threshold = 1
+        self.threshold = 2
         # create a topic partition object
-        self.tp = TopicPartition(topic=self.topic, partition=self.topic_partition)
+        self.consumer_tp = TopicPartition(topic=self.consumer_topic, partition=self.topic_partition)
         # self.offset = 0
 
         consumer_conf = {
             'bootstrap_servers': 'kafka-service.kafka:9092',
-            'group_id': 'my_group',
+            'group_id': 'Servers',
             'auto_offset_reset': 'earliest',
             "fetch_max_bytes": 10485880,
         }
 
         self.consumer = KafkaConsumer(**consumer_conf)
-        self.consumer.subscribe([self.topic])
+        self.consumer.subscribe([self.consumer_topic])
+
+        # Define the configuration for the Kafka producer
+        self.producer_topic = f"shard_{shard_id}_authorative"
+        producer_conf = {"bootstrap_servers": "kafka-service.kafka:9092",
+                "max_request_size": 10485880,
+                "value_serializer": lambda m: m,
+                }
+                # "buffer.memory": str(10485880 * 3),}
+        self.producer = KafkaProducer(**producer_conf)
         
     def __del__(self):
         # for connection, client_address in self.clients:
@@ -53,16 +62,16 @@ class Serverless(object):
     def average_model(self, clients_values):
         return clients_values[0]
 
-    def transmit_model(self,):
-        self.clients_values = self.average_model(self.clients_values)
-        for connection, client_address in self.clients:
-            print(f'Sending model back to the client {client_address} start!')
-            client_model = self.marshall(self.clients_values[client_address])
-            connection.sendall(client_model)
-            print(f'Sending model back to the client {client_address} done!')
-            # connection.close()
-        self.clients = []
-        self.clients_values = {}
+    def send_model_back2kafka(self, model):
+        print(f"Server {self.shard_id} start sending to kafka!")
+        msg = self.marshall(model)
+
+        # Send the message to the Kafka topic
+        self.producer.send(topic=self.producer_topic, key=f"Server {self.shard_id}".encode('utf-8'), value=msg)
+
+        # Wait for any outstanding messages to be delivered and delivery reports received
+        self.producer.flush()
+        print(f"Server {self.shard_id}  done sending to kafka!")
     
     def receiving_model_from_kafka(self,):
         print(f'Receiving model from kafka start!')
@@ -72,14 +81,17 @@ class Serverless(object):
             while True:
                 # 
                 
-                msgs = self.consumer.poll(timeout_ms=1000, max_records=self.threshold, update_offsets=True)[self.tp]
-                from IPython import embed; embed()
+                msgs = self.consumer.poll(timeout_ms=1000, max_records=self.threshold, update_offsets=True)
+                # from IPython import embed; embed()
+                
+                # 
                 
                 
                 if not msgs:
                     continue
                 # self.offset += len(msgs)
-                # self.consumer.seek(self.tp, self.offset)
+                # self.consumer.seek(self.consumer_tp, self.offset)
+                msgs = msgs[self.consumer_tp]
                 self.consumer.commit()
                 break
 
@@ -89,8 +101,8 @@ class Serverless(object):
             # Process the messages if the threshold is reached
             assert len(messages) >= self.threshold
             model = self.average_model(messages)
-            print("Averaged model:", model)
-            # self.transmit_model()
+            print("Averaged model:", model[0], len(model))
+            self.send_model_back2kafka(model[0])
             print(f'Receiving model from kafka, aggegate and produce back done!')
         except KeyboardInterrupt:
             pass
@@ -99,9 +111,9 @@ class Serverless(object):
         
         
         # Get the current high watermark and last committed offset for the partition
-        high_watermark_offset = self.consumer.end_offsets([self.tp])[self.tp]
+        high_watermark_offset = self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]
         
-        last_committed_offset = self.consumer.committed(self.tp)
+        last_committed_offset = self.consumer.committed(self.consumer_tp)
        # Calculate the number of unprocessed messages
         unprocessed_messages = high_watermark_offset - last_committed_offset if last_committed_offset is not None else high_watermark_offset
         # unprocessed_messages = high_watermark_offset - self.offset 

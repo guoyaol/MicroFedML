@@ -3,7 +3,7 @@ import os
 import sys
 import time
 import json
-from kafka import KafkaProducer
+from kafka import KafkaProducer, KafkaConsumer,TopicPartition
 
 class Client(object):
     """Class for client object having its own (private) data and resources to train a model.
@@ -32,7 +32,24 @@ class Client(object):
                     }
                     # "buffer.memory": str(10485880 * 3),}
             self.producer = KafkaProducer(**conf)
-            self.shards = 1
+            self.shards = 2
+
+            self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
+
+            # create a topic partition object
+            self.consumer_topics = [f"shard_{shard_id}_authorative" for shard_id in range(self.shards)]
+            self.consumer_tps = [TopicPartition(topic=topic, 
+                                            partition=self.topic_partition) for topic in self.consumer_topics]
+            # self.offset = 0
+
+            consumer_conf = {
+                'bootstrap_servers': 'kafka-service.kafka:9092',
+                'group_id': f'Client_{self.id}',
+                'auto_offset_reset': 'earliest',
+                "fetch_max_bytes": 10485880,
+            }
+            self.consumer = KafkaConsumer(**consumer_conf)
+            self.consumer.subscribe(self.consumer_topics)
 
     def __del__(self):
         pass
@@ -106,19 +123,20 @@ class Client(object):
         self.producer.flush()
         print(f"Client {self.id} done sending to kafka!")
 
-    # def get_param_from_kafka(self):
+    def get_param_from_kafka(self):
+        print(f'Receiving model from kafka start!')
+        model_shards = {}
+        while len(model_shards) < self.shards:
+            msgs = self.consumer.poll(timeout_ms=10000, max_records=self.shards, update_offsets=True)
+            # from IPython import embed; embed()
+            model_shards.update(msgs)
+        self.consumer.commit()
+        # Extract the message values
+        # from IPython import embed; embed()
+        messages = [model_shards[shard_name][0].value.decode('utf-8') for shard_name in self.consumer_tps]
+        for msg in messages:
+            print(len(msg))
+        self.model = messages[0][0]
+        print(f'Receiving model from kafka done!')
 
-    #     # Create a large random Torch tensor
-    #     # large_tensor = torch.randn(1000, 1000)
-    #     print(f"Client {self.id} start sending to kafka!")
-    #     msg = self.marshall(self.model)
-
-    #     # Convert the tensor to a JSON string
-    #     # tensor_str = json.dumps(large_tensor.numpy().tolist())
-
-    #     # Send the message to the Kafka topic
-    #     producer.produce(topic, key="my_key", value=msg)
-
-    #     # Wait for any outstanding messages to be delivered and delivery reports received
-    #     producer.flush()
-    #     print(f"Client {self.id} done sending to kafka!")
+            
