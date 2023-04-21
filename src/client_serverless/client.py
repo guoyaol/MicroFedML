@@ -2,7 +2,8 @@ import socket
 import os
 import sys
 import time
-from confluent_kafka import Producer, Consumer, KafkaError
+import json
+from kafka import KafkaProducer
 
 class Client(object):
     """Class for client object having its own (private) data and resources to train a model.
@@ -17,7 +18,7 @@ class Client(object):
     def __init__(self, client_id, server_address, serverless = False):
         self.id = client_id
         self.model = client_id % 10
-        self.model_size = 10000
+        self.model_size = 1000000
         self.server_address = server_address
         
         
@@ -25,11 +26,13 @@ class Client(object):
             # Define the topic to send messages to
 
             # Define the configuration for the Kafka producer
-            conf = {"bootstrap.servers": "kafka-service.kafka:9092",
-                    "message.max.bytes": "10485880",}
+            conf = {"bootstrap_servers": "kafka-service.kafka:9092",
+                    "max_request_size": 10485880,
+                    "value_serializer": lambda m: m,
+                    }
                     # "buffer.memory": str(10485880 * 3),}
-            self.partitions = 1
-            self.producer = Producer(conf)
+            self.producer = KafkaProducer(**conf)
+            self.shards = 1
 
     def __del__(self):
         pass
@@ -87,17 +90,17 @@ class Client(object):
         # large_tensor = torch.randn(1000, 1000)
         print(f"Client {self.id} start sending to kafka!")
         msg = self.marshall(self.model)
-        partition_size = len(msg) // self.partitions
+        shard_size = len(msg) // self.shards
         # Convert the tensor to a JSON string
         # tensor_str = json.dumps(large_tensor.numpy().tolist())
 
         # Send the message to the Kafka topic
-        for i in range(self.partitions):
-            start = i * partition_size
-            end = start + partition_size
-            if i == self.partitions - 1:
+        for i in range(self.shards):
+            start = i * shard_size
+            end = start + shard_size
+            if i == self.shards - 1:
                 end = len(msg)
-            self.producer.produce(topic=f"partition_{i}", key=f"Client {self.id}", value=msg[start:end])
+            self.producer.send(topic=f"shard_{i}", key=f"Client {self.id}".encode('utf-8'), value=msg[start:end])
 
         # Wait for any outstanding messages to be delivered and delivery reports received
         self.producer.flush()

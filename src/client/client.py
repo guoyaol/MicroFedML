@@ -2,7 +2,7 @@ import socket
 import os
 import sys
 import time
-from confluent_kafka import Producer, Consumer, KafkaError
+from kafka import KafkaProducer
 
 class Client(object):
     """Class for client object having its own (private) data and resources to train a model.
@@ -25,11 +25,13 @@ class Client(object):
             # Define the topic to send messages to
 
             # Define the configuration for the Kafka producer
-            conf = {"bootstrap.servers": "kafka-service.kafka:9092",
-                    "message.max.bytes": "10485880",}
+            conf = {"bootstrap_servers": "kafka-service.kafka:9092",
+                    "max_request_size": 10485880,
+                    "value_serializer": lambda m: json.dumps(m).encode('ascii'),
+                    }
                     # "buffer.memory": str(10485880 * 3),}
+            self.producer = KafkaProducer(**conf)
             self.partitions = 1
-            self.producer = Producer(conf)
 
     def __del__(self):
         pass
@@ -97,7 +99,7 @@ class Client(object):
             end = start + partition_size
             if i == self.partitions - 1:
                 end = len(msg)
-            self.producer.produce(topic=f"partition_{i}", key=f"Client {self.id}", value=msg[start:end])
+            self.producer.send(topic=f"partition_{i}", key=f"Client {self.id}", value=msg[start:end])
 
         # Wait for any outstanding messages to be delivered and delivery reports received
         self.producer.flush()

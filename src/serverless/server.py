@@ -1,7 +1,7 @@
 import socket
 import sys
 import os
-from confluent_kafka import Consumer, KafkaError, TopicPartition
+from kafka import KafkaConsumer, TopicPartition
 
 
 class Serverless(object):
@@ -13,24 +13,27 @@ class Serverless(object):
     In the next round, newly selected clients will recevie the updated global model as its local model.  
 
     """
-    def __init__(self, partition_id):
+    def __init__(self, shard_id):
         self.clients = []
         self.clients_values = {}
         self.model_size = 10000000
-        self.partition_id = partition_id
+        self.shard_id = shard_id
 
-        self.topic = f"partition_{partition_id}"
+        self.topic = f"shard_{shard_id}"
         self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
         self.threshold = 1
+        # create a topic partition object
+        self.tp = TopicPartition(topic=self.topic, partition=self.topic_partition)
+        # self.offset = 0
 
-        self.consumer_conf = {
-            'bootstrap.servers': 'kafka-service.kafka:9092',
-            'group.id': 'my_group',
-            'auto.offset.reset': 'earliest',
-            "message.max.bytes": "10485880",
+        consumer_conf = {
+            'bootstrap_servers': 'kafka-service.kafka:9092',
+            'group_id': 'my_group',
+            'auto_offset_reset': 'earliest',
+            "fetch_max_bytes": 10485880,
         }
 
-        self.consumer = Consumer(self.consumer_conf)
+        self.consumer = KafkaConsumer(**consumer_conf)
         self.consumer.subscribe([self.topic])
         
     def __del__(self):
@@ -62,68 +65,52 @@ class Serverless(object):
         self.clients_values = {}
     
     def receiving_model_from_kafka(self,):
+        print(f'Receiving model from kafka start!')
         try:
+            
+            # Poll for new messages
             while True:
-                # Poll for new messages
-                msgs = consumer.consume(num_messages=self.threshold, timeout=1.0)
-
+                # 
+                
+                msgs = self.consumer.poll(timeout_ms=1000, max_records=self.threshold, update_offsets=True)[self.tp]
+                from IPython import embed; embed()
+                
+                
                 if not msgs:
                     continue
+                # self.offset += len(msgs)
+                # self.consumer.seek(self.tp, self.offset)
+                self.consumer.commit()
+                break
 
-                # Extract the message values
-                messages = [msg.value().decode('utf-8') for msg in msgs]
-
-                # Process the messages if the threshold is reached
-                assert len(messages) >= self.threshold
-                model = self.average_model(messages)
-                print("Averaged model:", model)
-                # self.transmit_model()
+            # Extract the message values
+            messages = [msg.value.decode('utf-8') for msg in msgs]
             
+            # Process the messages if the threshold is reached
+            assert len(messages) >= self.threshold
+            model = self.average_model(messages)
+            print("Averaged model:", model)
+            # self.transmit_model()
+            print(f'Receiving model from kafka, aggegate and produce back done!')
         except KeyboardInterrupt:
             pass
         
     def checking_model_que_from_kafka(self,):
-        print(f'Receiving model from kafka start!')
-        # conn.settimeout(2)
-        # received = ""
-        # # while True:
-        # #     try:
-        # #         data = conn.recv(64)
-        # #         if len(data) > 0:
-        # #             received += self.unmarshall(data)
-                    
-        # #         else:
-        # #             break
-        # #     except Exception as e:
-        # #         break
-        # amount_received = 0
-        # amount_expected = self.model_size
-
-        # while amount_received < amount_expected:
-        #     data = self.unmarshall(conn.recv(64))
-        #     if len(data) > 0:
-        #         received += data
-        #     amount_received += len(data)
-        # model = received[0]
-        # print(received[0])
-        # self.clients_values[client_address] = model
-        # self.clients.append((conn, client_address))
         
-        # create a topic partition object
-        tp = TopicPartition(topic=self.topic, partition=self.topic_partition)
+        
         # Get the current high watermark and last committed offset for the partition
-        watermark_offsets = self.consumer.get_watermark_offsets(tp)
-        high_watermark_offset = watermark_offsets.high
-        last_committed_offset = watermark_offsets.offsets[0]
-
-        # Calculate the number of unprocessed messages
-        unprocessed_messages = high_watermark_offset - last_committed_offset
-
+        high_watermark_offset = self.consumer.end_offsets([self.tp])[self.tp]
+        
+        last_committed_offset = self.consumer.committed(self.tp)
+       # Calculate the number of unprocessed messages
+        unprocessed_messages = high_watermark_offset - last_committed_offset if last_committed_offset is not None else high_watermark_offset
+        # unprocessed_messages = high_watermark_offset - self.offset 
+        # print(unprocessed_messages)
         if unprocessed_messages >= self.threshold:
             # Trigger the function to consume messages
             self.receiving_model_from_kafka()
-            print(f'Receiving model from kafka, aggegate and produce back done!')
+            
         else:
             # Wait for more messages to be produced
-            print(f'current unprocessed_messages num: {unprocessed_messages}')
+            # print(f'current unprocessed_messages num: {unprocessed_messages}')
             pass

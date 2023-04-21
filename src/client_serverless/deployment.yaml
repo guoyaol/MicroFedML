@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: client
-        image: "docker.io/liugztat/q6993607-client:latest"
+        image: "docker.io/liugztat/q6993607-client_serverless:latest"
         imagePullPolicy: Always # add this line
         env:
         - name: PYTHONUNBUFFERED
