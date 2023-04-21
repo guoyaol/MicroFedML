@@ -81,6 +81,8 @@ class Client(object):
 
                 if self.device == "cuda": torch.cuda.empty_cache()               
         self.model.to("cpu")
+        self.grad = get_grad(xxx)
+        self.compressed_grad = self.compress(self.grad)
         self.model_tensor =  self.compress(self.marshall(self.model))
 
     def client_evaluate_train(self):

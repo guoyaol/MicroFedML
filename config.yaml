@@ -20,7 +20,7 @@ fed_config:
 ---
 optim_config:
   lr: 0.01
-  momentum: 0.9
+  momentum: 0
 ---
 init_config:
   init_type: "xavier"
