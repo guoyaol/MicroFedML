@@ -218,8 +218,8 @@ class Server(object):
                 else:
                     averaged_weights[key] += coefficients[it] * local_weights[key]
 
-        averaged_gradients_sketch, error = uncompress()
-        averaged_gradients = self.unmarshall(averaged_gradients_sketch)
+        averaged_gradients_tensor, error = uncompress()
+        averaged_gradients = self.unmarshall(averaged_gradients_tensor, self.model.state_dict())
         self.error = error
         self.model = averaged_gradients + self.model
         self.model.load_state_dict(averaged_weights)
@@ -227,7 +227,18 @@ class Server(object):
         message = f"[Round: {str(self._round).zfill(4)}] ...updated weights of {len(sampled_client_indices)} clients are successfully averaged!"
         print(message); logging.info(message)
         del message; gc.collect()
-    
+
+    def unmarshall(self, tensor, state_dict):
+        # restore the state_dict from the tensor
+        state_dict_restored = {}
+        index = 0
+        for k, v in state_dict.items():
+            shape = v.shape
+            size = v.numel()
+            state_dict_restored[k] = tensor[index:index+size].reshape(shape)
+            index += size
+        return state_dict_restored
+
     def evaluate_selected_models(self, sampled_client_indices):
         """Call "client_evaluate" function of each selected client."""
         message = f"[Round: {str(self._round).zfill(4)}] Evaluate selected {str(len(sampled_client_indices))} clients' models...!"

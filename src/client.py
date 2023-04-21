@@ -85,6 +85,11 @@ class Client(object):
         self.compressed_grad = self.compress(self.grad)
         self.model_tensor =  self.compress(self.marshall(self.model))
 
+    def marshall(self, state_dict):
+        # convert the state_dict to a tensor
+        tensor = torch.cat([v.flatten() for v in state_dict.values()])
+        return tensor
+
     def client_evaluate_train(self):
         """Evaluate local model using local dataset (same as training set for convenience)."""
         self.model.eval()
