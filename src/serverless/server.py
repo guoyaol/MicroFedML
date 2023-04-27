@@ -16,7 +16,7 @@ class Serverless(object):
     def __init__(self, shard_id):
         self.clients = []
         self.clients_values = {}
-        self.model_size = 1000000
+        self.model_size = 333333
         self.shard_id = shard_id
 
         self.consumer_topic = f"shard_{shard_id}"
@@ -34,7 +34,8 @@ class Serverless(object):
         }
 
         self.consumer = KafkaConsumer(**consumer_conf)
-        self.consumer.subscribe([self.consumer_topic])
+        # self.consumer.subscribe([self.consumer_topic])
+        self.consumer.assign([self.consumer_tp])
 
         # Define the configuration for the Kafka producer
         self.producer_topic = f"shard_{shard_id}_authorative"
@@ -74,20 +75,29 @@ class Serverless(object):
         print(f"Server {self.shard_id}  done sending to kafka!")
     
     def receiving_model_from_kafka(self,):
-        print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)} / {self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]}')
+        # print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)}')
+        # partitions = self.consumer.partitions_for_topic(self.consumer_topic)
+
+        # Print the partitions for the topic
+        # print(f"Partitions for topic {self.consumer_topic}: {partitions}")
+        # print(self.consumer.assignment())
+        print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)} / {self.consumer.highwater(self.consumer_tp)} / {self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]}')
         client_updates = []
         try:
             # Poll for new messages
             while True:
                 # 
-                
-                msgs = self.consumer.poll(timeout_ms=1000, max_records=self.threshold, update_offsets=True)
+                # 
                 # from IPython import embed; embed()
+                msgs = self.consumer.poll(timeout_ms=1000, max_records=self.threshold, update_offsets=True)
+                # 
                 
                 # 
                 
                 
                 if not msgs:
+                    print("!!")
+                    # from IPython import embed; embed()
                     continue
                 # self.offset += len(msgs)
                 # self.consumer.seek(self.consumer_tp, self.offset)
@@ -97,6 +107,9 @@ class Serverless(object):
                 self.consumer.commit()
                 if len(client_updates) >= self.threshold:
                     break
+                else:
+                    print("!!?")
+                    # from IPython import embed; embed()
 
             # Extract the message values
             messages = [msg.value.decode('utf-8') for msg in client_updates]
@@ -107,6 +120,7 @@ class Serverless(object):
             print("Averaged model:", model[0], len(model))
             self.send_model_back2kafka(model[0])
             print(f'Receiving model from kafka, aggegate and produce back done!')
+            print("")
         except KeyboardInterrupt:
             pass
         
@@ -118,7 +132,7 @@ class Serverless(object):
         
         last_committed_offset = self.consumer.committed(self.consumer_tp)
        # Calculate the number of unprocessed messages
-        unprocessed_messages = high_watermark_offset - last_committed_offset if last_committed_offset is not None else high_watermark_offset
+        unprocessed_messages = (high_watermark_offset - last_committed_offset) if last_committed_offset is not None else high_watermark_offset
         # unprocessed_messages = high_watermark_offset - self.offset 
         # print(unprocessed_messages)
         if unprocessed_messages >= self.threshold:

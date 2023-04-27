@@ -13,7 +13,7 @@ server_address = None#(SRV, PORT)
 cli = Client(cli_id, server_address, serverless = True)
 while 1:
     start_time = time.perf_counter()
-    print(f"Client Loop {cli_id} begins")
+    print(f"Client {cli_id} Loop {counter} begins")
     # if counter != 0:
     #     cli.get_param_from_kafka()
     cli.client_update()
@@ -24,4 +24,5 @@ while 1:
     end_time = time.perf_counter()  # record the end time
     elapsed_time = int((end_time - start_time) * 1000)  # calculate elapsed time in milliseconds
     print(f"Client Loop {cli_id} ends, took {elapsed_time} seconds to execute.")
+    print("")
 

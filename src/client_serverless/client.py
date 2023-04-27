@@ -32,7 +32,7 @@ class Client(object):
                     }
                     # "buffer.memory": str(10485880 * 3),}
             self.producer = KafkaProducer(**conf)
-            self.shards = 1
+            self.shards = 3
 
             self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
 
