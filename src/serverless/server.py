@@ -16,12 +16,14 @@ class Serverless(object):
     def __init__(self, shard_id):
         self.clients = []
         self.clients_values = {}
-        self.model_size = 333333
+        self.model_size = None
         self.shard_id = shard_id
+
+        self.total_replicas = int(os.environ.get('STATEFULSET_REPLICAS', 1))
 
         self.consumer_topic = f"shard_{shard_id}"
         self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
-        self.threshold = 2
+        self.threshold = int(os.environ.get('CLIENTS'))#2
         # create a topic partition object
         self.consumer_tp = TopicPartition(topic=self.consumer_topic, partition=self.topic_partition)
         # self.offset = 0
@@ -118,6 +120,8 @@ class Serverless(object):
             assert len(messages) >= self.threshold
             model = self.average_model(messages)
             print("Averaged model:", model[0], len(model))
+            if self.model_size is None:
+                self.model_size = len(model)
             self.send_model_back2kafka(model[0])
             print(f'Receiving model from kafka, aggegate and produce back done!')
             print("")

@@ -18,7 +18,7 @@ class Client(object):
     def __init__(self, client_id, server_address, serverless = False):
         self.id = client_id
         self.model = client_id % 10
-        self.model_size = 1000000
+        self.model_size = int(os.environ.get('MODEL_SIZE'))#1000000
         self.server_address = server_address
         
         
@@ -32,7 +32,7 @@ class Client(object):
                     }
                     # "buffer.memory": str(10485880 * 3),}
             self.producer = KafkaProducer(**conf)
-            self.shards = 3
+            self.shards = int(os.environ.get('SHARDS'))#3
 
             self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
 

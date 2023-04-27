@@ -8,7 +8,7 @@ counter = 0
 # SRV = os.getenv('SERVER_ADDRESS') #'0.0.0.0'#
 # PORT = int(os.getenv('SERVER_PORT')) #13333#
 
-cli_id = int(sys.argv[1])
+cli_id = int(os.environ.get('HOSTNAME')[-1]) #int(sys.argv[1])
 server_address = None#(SRV, PORT)
 cli = Client(cli_id, server_address, serverless = True)
 while 1:

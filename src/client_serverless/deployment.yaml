@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: client-deployment
 spec:
@@ -23,3 +23,7 @@ spec:
           value: my-server-service
         - name: SERVER_PORT
           value: "30152"
+        - name: MODEL_SIZE
+          value: "1000000"
+        - name: SHARDS
+          value: "3"
