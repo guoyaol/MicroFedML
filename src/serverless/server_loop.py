@@ -2,7 +2,8 @@ import socket
 import sys
 import os
 from server import Serverless
-
+# import logging
+# logging.basicConfig(level=logging.DEBUG)
 # PORT = int(os.getenv('LISTEN_PORT')) #13333#
 
 # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

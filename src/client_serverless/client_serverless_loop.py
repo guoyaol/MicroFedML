@@ -5,6 +5,9 @@ import time
 from client import Client
 counter = 0
 
+import logging
+# logging.basicConfig(level=logging.DEBUG)
+
 # SRV = os.getenv('SERVER_ADDRESS') #'0.0.0.0'#
 # PORT = int(os.getenv('SERVER_PORT')) #13333#
 
@@ -23,6 +26,6 @@ while 1:
     counter += 1
     end_time = time.perf_counter()  # record the end time
     elapsed_time = int((end_time - start_time) * 1000)  # calculate elapsed time in milliseconds
-    print(f"Client Loop {cli_id} ends, took {elapsed_time} seconds to execute.")
+    print(f"Client Loop {cli_id} ends, took {elapsed_time} mili-seconds to execute.")
     print("")
 

@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: client-deployment
+  name: communi-deployment
 spec:
   selector:
     matchLabels:
-      app: client
-  replicas: 2
+      app: communi
+  replicas: 1
   template:
     metadata:
       labels:
-        app: client
+        app: communi
     spec:
       containers:
-      - name: client
-        image: "docker.io/liugztat/q6993607-client_serverless:latest"
+      - name: communi
+        image: "docker.io/liugztat/q-communi_serverless:latest"
         imagePullPolicy: Always # add this line
         env:
         - name: PYTHONUNBUFFERED
@@ -24,6 +24,6 @@ spec:
         - name: SERVER_PORT
           value: "30152"
         - name: MODEL_SIZE
-          value: "1000000"
+          value: "10000"
         - name: SHARDS
           value: "3"

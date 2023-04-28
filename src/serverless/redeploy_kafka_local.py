@@ -22,4 +22,6 @@ os.system("kubectl get all -n kafka")
 
 # kubectl logs -n kafka -f pod/kafka-broker-
 
-# kubectl exec -it server-deployment-0 sh -n kafka
+# kubectl exec -it -n kafka communi-deployment-0 sh
+
+# kubectl describe -n kafka 
