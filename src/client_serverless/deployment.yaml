@@ -24,6 +24,6 @@ spec:
         - name: SERVER_PORT
           value: "30152"
         - name: MODEL_SIZE
-          value: "1000000"
+          value: "10000"
         - name: SHARDS
           value: "3"

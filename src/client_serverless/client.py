@@ -26,7 +26,7 @@ class Client(object):
             # Define the topic to send messages to
 
             # Define the configuration for the Kafka producer
-            conf = {"bootstrap_servers": "kafka-service.kafka:9092",
+            conf = {"bootstrap_servers": "kafka-service.kafka.svc.cluster.local:9092",
                     "max_request_size": 10485880,
                     "value_serializer": lambda m: m,
                     }
@@ -43,13 +43,14 @@ class Client(object):
             # self.offset = 0
 
             consumer_conf = {
-                'bootstrap_servers': 'kafka-service.kafka:9092',
+                'bootstrap_servers': 'kafka-service.kafka.svc.cluster.local:9092',
                 'group_id': f'Client_{self.id}',
                 'auto_offset_reset': 'earliest',
                 "fetch_max_bytes": 10485880,
             }
             self.consumer = KafkaConsumer(**consumer_conf)
             self.consumer.subscribe(self.consumer_topics)
+            print("client init done!")
 
     def __del__(self):
         pass

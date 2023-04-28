@@ -10,8 +10,10 @@ from server import Serverless
 # print('Starting up on {} port {}'.format(*server_address))
 # sock.bind(server_address)
 # sock.listen()
-shard_id = int(os.environ.get('HOSTNAME')[-1]) #int(sys.argv[1])#
-server = Serverless(shard_id=shard_id)
+in_pod = True
+shard_id = int(os.environ.get('HOSTNAME')[-1]) if in_pod else int(sys.argv[1])#
+server = Serverless(shard_id=shard_id, in_pod=in_pod)
+print(f"server {shard_id} started!")
 while True:
     # print('\nWaiting for a connection')
     # connection, client_address = sock.accept()

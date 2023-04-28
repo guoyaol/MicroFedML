@@ -13,23 +13,23 @@ class Serverless(object):
     In the next round, newly selected clients will recevie the updated global model as its local model.  
 
     """
-    def __init__(self, shard_id):
+    def __init__(self, shard_id, in_pod=True):
         self.clients = []
         self.clients_values = {}
         self.model_size = None
         self.shard_id = shard_id
 
-        self.total_replicas = int(os.environ.get('STATEFULSET_REPLICAS', 1))
+        # self.total_replicas = int(os.environ.get('STATEFULSET_REPLICAS', 1))
 
         self.consumer_topic = f"shard_{shard_id}"
         self.topic_partition = 0  ##topic partition in kafka, not model, always 0 now
-        self.threshold = int(os.environ.get('CLIENTS'))#2
+        self.threshold = int(os.environ.get('CLIENTS')) if in_pod else 2
         # create a topic partition object
         self.consumer_tp = TopicPartition(topic=self.consumer_topic, partition=self.topic_partition)
         # self.offset = 0
 
         consumer_conf = {
-            'bootstrap_servers': 'kafka-service.kafka:9092',
+            'bootstrap_servers': 'kafka-service.kafka.svc.cluster.local:9092',
             'group_id': 'Servers',
             'auto_offset_reset': 'earliest',
             "fetch_max_bytes": 10485880,
@@ -41,7 +41,7 @@ class Serverless(object):
 
         # Define the configuration for the Kafka producer
         self.producer_topic = f"shard_{shard_id}_authorative"
-        producer_conf = {"bootstrap_servers": "kafka-service.kafka:9092",
+        producer_conf = {"bootstrap_servers": "kafka-service.kafka.svc.cluster.local:9092",
                 "max_request_size": 10485880,
                 "value_serializer": lambda m: m,
                 }
@@ -77,23 +77,27 @@ class Serverless(object):
         print(f"Server {self.shard_id}  done sending to kafka!")
     
     def receiving_model_from_kafka(self,):
-        # print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)}')
+        print(f'Receiving model from kafka start!')
         # partitions = self.consumer.partitions_for_topic(self.consumer_topic)
 
         # Print the partitions for the topic
         # print(f"Partitions for topic {self.consumer_topic}: {partitions}")
-        # print(self.consumer.assignment())
-        print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)} / {self.consumer.highwater(self.consumer_tp)} / {self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]}')
+        print(self.consumer.assignment())
+        # from IPython import embed; embed()
+        print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)}')
+        print(123)
+        print(f'Receiving model from kafka start! Before receive watermark: {self.consumer.committed(self.consumer_tp)} / {self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]}')
         client_updates = []
         try:
             # Poll for new messages
             while True:
                 # 
                 # 
-                # from IPython import embed; embed()
+                #
+                print(456)
                 msgs = self.consumer.poll(timeout_ms=1000, max_records=self.threshold, update_offsets=True)
                 # 
-                
+                print(789)
                 # 
                 
                 
@@ -132,18 +136,18 @@ class Serverless(object):
         
         
         # Get the current high watermark and last committed offset for the partition
-        high_watermark_offset = self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]
+    #     high_watermark_offset = self.consumer.end_offsets([self.consumer_tp])[self.consumer_tp]
         
-        last_committed_offset = self.consumer.committed(self.consumer_tp)
-       # Calculate the number of unprocessed messages
-        unprocessed_messages = (high_watermark_offset - last_committed_offset) if last_committed_offset is not None else high_watermark_offset
+    #     last_committed_offset = self.consumer.committed(self.consumer_tp)
+    #    # Calculate the number of unprocessed messages
+    #     unprocessed_messages = (high_watermark_offset - last_committed_offset) if last_committed_offset is not None else high_watermark_offset
         # unprocessed_messages = high_watermark_offset - self.offset 
         # print(unprocessed_messages)
-        if unprocessed_messages >= self.threshold:
+        # if unprocessed_messages >= self.threshold:
             # Trigger the function to consume messages
-            self.receiving_model_from_kafka()
+        self.receiving_model_from_kafka()
             
-        else:
+        # else:
             # Wait for more messages to be produced
             # print(f'current unprocessed_messages num: {unprocessed_messages}')
-            pass
+            # pass
