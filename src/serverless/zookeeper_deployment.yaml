@@ -25,7 +25,7 @@ spec:
     app: zookeeper
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   labels:
     app: zookeeper
