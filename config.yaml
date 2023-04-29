@@ -1,3 +1,4 @@
+# TODO: add sketch config
 global_config:
   seed: 5959
   device: "cpu"
@@ -44,3 +45,10 @@ log_config:
   log_name:  "FL.log"
   tb_port: 5252
   tb_host: "0.0.0.0"
+---
+sketch_config:
+  sketch_d: 0 # TODO
+  sketch_c: 0
+  sketch_r: 0
+  eta: 0
+  k: 0
