@@ -223,7 +223,7 @@ class Server(object):
         print(message); logging.info(message)
         del message; gc.collect()
     
-    def evaluate_selected_models(self, sampled_client_indices):
+    def evaluate_selected_models_train(self, sampled_client_indices):
         """Call "client_evaluate" function of each selected client."""
         message = f"[Round: {str(self._round).zfill(4)}] Evaluate selected {str(len(sampled_client_indices))} clients' models...!"
         print(message); logging.info(message)
@@ -231,15 +231,31 @@ class Server(object):
 
         for idx in sampled_client_indices:
             self.clients[idx].client_evaluate_train()
+
+        message = f"[Round: {str(self._round).zfill(4)}] ...finished evaluation of {str(len(sampled_client_indices))} selected clients!"
+        print(message); logging.info(message)
+        del message; gc.collect()
+
+    def evaluate_selected_models_test(self, sampled_client_indices):
+        """Call "client_evaluate" function of each selected client."""
+        message = f"[Round: {str(self._round).zfill(4)}] Evaluate selected {str(len(sampled_client_indices))} clients' models...!"
+        print(message); logging.info(message)
+        del message; gc.collect()
+
+        for idx in sampled_client_indices:
             self.clients[idx].client_evaluate_test()
 
         message = f"[Round: {str(self._round).zfill(4)}] ...finished evaluation of {str(len(sampled_client_indices))} selected clients!"
         print(message); logging.info(message)
         del message; gc.collect()
 
-    def mp_evaluate_selected_models(self, selected_index):
+    def mp_evaluate_selected_models_train(self, selected_index):
         """Multiprocessing-applied version of "evaluate_selected_models" method."""
         self.clients[selected_index].client_evaluate_train()
+        return True
+    
+    def mp_evaluate_selected_models_test(self, selected_index):
+        """Multiprocessing-applied version of "evaluate_selected_models" method."""
         self.clients[selected_index].client_evaluate_test()
         return True
 
@@ -251,6 +267,17 @@ class Server(object):
         # send global model to the selected clients
         self.transmit_model(sampled_client_indices)
 
+        # evaluate the whole model with local dataset (same as the one used for local update)
+        if self.mp_flag:
+            message = f"[Round: {str(self._round).zfill(4)}] Evaluate selected {str(len(sampled_client_indices))} clients' models...!"
+            print(message); logging.info(message)
+            del message; gc.collect()
+
+            with pool.ThreadPool(processes=cpu_count() - 1) as workhorse:
+                workhorse.map(self.mp_evaluate_selected_models_test, sampled_client_indices)
+        else:
+            self.evaluate_selected_models_test(sampled_client_indices)
+
         # updated selected clients with local dataset
         if self.mp_flag:
             with pool.ThreadPool(processes=cpu_count() - 1) as workhorse:
@@ -259,16 +286,17 @@ class Server(object):
         else:
             selected_total_size = self.update_selected_clients(sampled_client_indices)
 
-        # evaluate selected clients with local dataset (same as the one used for local update)
+        # evaluate selected clients with local training dataset (same as the one used for local update)
         if self.mp_flag:
             message = f"[Round: {str(self._round).zfill(4)}] Evaluate selected {str(len(sampled_client_indices))} clients' models...!"
             print(message); logging.info(message)
             del message; gc.collect()
 
             with pool.ThreadPool(processes=cpu_count() - 1) as workhorse:
-                workhorse.map(self.mp_evaluate_selected_models, sampled_client_indices)
+                workhorse.map(self.mp_evaluate_selected_models_train, sampled_client_indices)
         else:
-            self.evaluate_selected_models(sampled_client_indices)
+            self.evaluate_selected_models_train(sampled_client_indices)
+
 
         # calculate averaging coefficient of weights
         mixing_coefficients = [len(self.clients[idx]) / selected_total_size for idx in sampled_client_indices]
