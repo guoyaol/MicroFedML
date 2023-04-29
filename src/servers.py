@@ -82,19 +82,16 @@ class Server(object):
         self.num_rounds = fed_config["R"]
         self.local_epochs = fed_config["E"]
         self.batch_size = fed_config["B"]
-
         self.criterion = fed_config["criterion"]
         self.optimizer = fed_config["optimizer"]
-        self.optim_config = optim_config
 
-        self.sketch_d: int = sketch_config["d"]
-        self.sketch_c: int = sketch_config["c"]
-        self.sketch_r: int = sketch_config["r"]
-        self.eta: float = sketch_config["eta"]
+        self.optim_config = optim_config
+        self.learning_rate: float = optim_config["lr"]
+
+        self.sketch_d: int = sum(p.numel() for p in self.model.parameters())
+        self.sketch_c: int = sketch_config["sketch_c"]
+        self.sketch_r: int = sketch_config["sketch_r"]
         self.sketch_k: int = sketch_config["k"]
-        # TODO: initialize the error sketch to 0
-        # TODO: initialize a sketch for aggregating the gradient sketches
-        # Temporarily initialize them to None
 
         self.error: CSVec = CSVec(self.sketch_d, self.sketch_c, self.sketch_r)
 
@@ -315,25 +312,28 @@ class Server(object):
             )
 
         gradient_with_error_table: torch.Tensor = (
-            gradient_sketch.table * self.eta + self.error.table
+            gradient_sketch.table * self.learning_rate + self.error.table
         )
         uncompressed_gradients = CSVec(
             self.sketch_d, self.sketch_c, self.sketch_r
         ).uncompress(gradient_with_error_table, k=self.k)
-        # TODO: is this the right way to call this API?
-        gradient = self.unmarshall(uncompressed_gradients, self.model.state_dict())
+        gradient_dict: dict = self.unmarshall(
+            uncompressed_gradients, self.model.state_dict()
+        )
         # Update the error sketch
         self.error.table = gradient_with_error_table - CSVec(
             self.sketch_d, self.sketch_c, self.sketch_r
         ).compress(uncompressed_gradients)
+
+        # Update the model with the gradients
+        for k, v in self.model.state_dict().items():
+            v += gradient_dict[k]
 
         message = f"[Round: {str(self._round).zfill(4)}] ...updated weights of {len(sampled_client_indices)} clients are successfully averaged!"
         print(message)
         logging.info(message)
         del message
         gc.collect()
-
-        return gradient
 
     def unmarshall(self, tensor, state_dict):
         # restore the state_dict from the tensor
@@ -408,7 +408,8 @@ class Server(object):
         ]
 
         # average each updated model parameters of the selected clients and update the global model
-        self.average_model(sampled_client_indices, mixing_coefficients)
+        # self.average_model(sampled_client_indices, mixing_coefficients)
+        self.average_gradient(sampled_client_indices, mixing_coefficients)
 
     def evaluate_global_model(self):
         """Evaluate the global model using the global holdout dataset (self.data)."""
