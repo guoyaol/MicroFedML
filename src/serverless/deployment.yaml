@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: server
-        image: "docker.io/liugztat/q699-server_serverless:latest"
+        image: "docker.io/liugztat/guoyao-server_serverless:latest"
         imagePullPolicy: Always # add this line
         env:
         - name: PYTHONUNBUFFERED
