@@ -316,7 +316,7 @@ class Server(object):
         )
         uncompressed_gradients = CSVec(
             self.sketch_d, self.sketch_c, self.sketch_r
-        ).uncompress(gradient_with_error_table, k=self.k)
+        ).uncompress(gradient_with_error_table, k=self.sketch_k)
         gradient_dict: dict = self.unmarshall(
             uncompressed_gradients, self.model.state_dict()
         )

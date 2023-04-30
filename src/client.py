@@ -81,9 +81,9 @@ class Client(object):
 
                 if self.device == "cuda": torch.cuda.empty_cache()               
         self.model.to("cpu")
-        self.grad = get_grad(xxx)
-        self.compressed_grad = self.compress(self.grad)
-        self.model_tensor =  self.compress(self.marshall(self.model))
+        # self.grad = get_grad(xxx)
+        # self.compressed_grad = self.compress(self.grad)
+        # self.model_tensor =  self.compress(self.marshall(self.model))
 
     def marshall(self, state_dict):
         # convert the state_dict to a tensor
