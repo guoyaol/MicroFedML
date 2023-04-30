@@ -301,3 +301,14 @@ def create_datasets_global(data_path, dataset_name, num_clients, num_shards, iid
             for i in range(0, len(shard_inputs_sorted), shards_per_clients)
         ]
     return local_datasets, test_dataset
+
+def split_integer_into_parts(integer, n):
+    quotient = integer // n
+    remainder = integer % n
+    
+    result = [quotient] * n
+    
+    for i in range(remainder):
+        result[i] += 1
+
+    return result

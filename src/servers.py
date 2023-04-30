@@ -88,12 +88,17 @@ class Server(object):
         self.optim_config = optim_config
         self.learning_rate: float = optim_config["lr"]
 
-        self.sketch_d: int = sum(p.numel() for p in self.model.parameters())
+        # self.sketch_d: int = sum(p.numel() for p in self.model.parameters())
+        self.num_server = 3
+        self.whole_model_size: int = sum(p.numel() for p in self.model.parameters())
+        self.sketch_d = split_integer_into_parts(self.whole_model_size, self.num_server)
+
         self.sketch_c: int = sketch_config["sketch_c"]
         self.sketch_r: int = sketch_config["sketch_r"]
         self.sketch_k: int = sketch_config["k"]
 
-        self.error: CSVec = CSVec(self.sketch_d, self.sketch_c, self.sketch_r)
+        # self.error: CSVec = CSVec(self.sketch_d, self.sketch_c, self.sketch_r)
+        self.error = [CSVec(self.sketch_d[i], self.sketch_c, self.sketch_r) for i in range(self.num_server)]
 
     def setup(self, **init_kwargs):
         """Set up all configuration for federated learning."""
@@ -301,27 +306,40 @@ class Server(object):
         gc.collect()
 
         # Gather gradients from clients
-        gradient_sketch: CSVec = CSVec(self.sketch_d, self.sketch_c, self.sketch_r)
-        for it, idx in tqdm(enumerate(sampled_client_indices), leave=False):
-            concated_gradient = torch.cat([v.flatten() for _, v in self.clients[idx].grad_dict.items()])
-            sketch: CSVec = CSVec(self.sketch_d, self.sketch_c, self.sketch_r)
-            compressed_gradient_table: torch.Tensor = sketch.compress(concated_gradient)
-            gradient_sketch.accumulateTable(
-                compressed_gradient_table * coefficients[it]
-            )
+        gradient_sketch = [CSVec(self.sketch_d[i], self.sketch_c, self.sketch_r) for i in range(self.num_server)]
+        gradient_start_index = 0
+        whole_uncompressed_gradient = torch.zeros(self.whole_model_size)
+        for server_index in range(self.num_server):
+            for it, idx in tqdm(enumerate(sampled_client_indices), leave=False):
+                #marshall into a single vector
+                concated_gradient = torch.cat([v.flatten() for _, v in self.clients[idx].grad_dict.items()])
+                sliced_gradient = concated_gradient[gradient_start_index:gradient_start_index + self.sketch_d[server_index]]
 
-        gradient_with_error_table: torch.Tensor = (
-            gradient_sketch.table * self.learning_rate + self.error.table
-        )
-        uncompressed_gradients = CSVec(
-            self.sketch_d, self.sketch_c, self.sketch_r
-        ).uncompress(gradient_with_error_table, k=self.sketch_k)
+                sketch: CSVec = CSVec(self.sketch_d[server_index], self.sketch_c, self.sketch_r)
+                compressed_gradient_table: torch.Tensor = sketch.compress(sliced_gradient)
+                gradient_sketch[server_index].accumulateTable(
+                    compressed_gradient_table * coefficients[it]
+                )
+
+            gradient_with_error_table: torch.Tensor = (
+                gradient_sketch[server_index].table * self.learning_rate + self.error[server_index].table
+            )
+            uncompressed_gradients = CSVec(
+                self.sketch_d[server_index], self.sketch_c, self.sketch_r
+            ).uncompress(gradient_with_error_table, k=self.sketch_k)
+            
+            # Update the error sketch
+            self.error[server_index].table = gradient_with_error_table - CSVec(
+                self.sketch_d[server_index], self.sketch_c, self.sketch_r
+            ).compress(uncompressed_gradients)
+
+            whole_uncompressed_gradient[gradient_start_index:gradient_start_index + self.sketch_d[server_index]] = uncompressed_gradients
+
+            gradient_start_index += self.sketch_d[server_index]
+
+
         gradient_dict: dict = self.recover_gradient(
-            uncompressed_gradients, self.model)
-        # Update the error sketch
-        self.error.table = gradient_with_error_table - CSVec(
-            self.sketch_d, self.sketch_c, self.sketch_r
-        ).compress(uncompressed_gradients)
+            whole_uncompressed_gradient, self.model)
 
         # Update the model with the gradients
         for k, v in self.model.state_dict().items():
