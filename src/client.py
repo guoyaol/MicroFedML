@@ -1,6 +1,7 @@
 import gc
 import pickle
 import logging
+from collections import OrderedDict
 
 import torch
 import torch.nn as nn
@@ -66,6 +67,7 @@ class Client(object):
         """Update local model using local dataset."""
         self.model.train()
         self.model.to(self.device)
+        self.grad_dict: dict = OrderedDict()
 
         optimizer = eval(self.optimizer)(self.model.parameters(), **self.optim_config)
         for e in range(self.local_epoch):
@@ -77,6 +79,13 @@ class Client(object):
                 loss = eval(self.criterion)()(outputs, labels)
 
                 loss.backward()
+                # Collect gradients during update
+                for name, param in self.model.named_parameters():
+                    if param.grad is not None:
+                        if name not in self.grad_dict.keys():
+                            self.grad_dict[name] = param.grad
+                        else:
+                            self.grad_dict[name] += param.grad
                 optimizer.step() 
 
                 if self.device == "cuda": torch.cuda.empty_cache()               

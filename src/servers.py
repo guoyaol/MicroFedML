@@ -291,6 +291,8 @@ class Server(object):
     def average_gradient(
         self, sampled_client_indices: list[int], coefficients: list[float]
     ):
+        print(f"sampled_client_indices: {sampled_client_indices}")
+        # print(f"coefficients: {coefficients}")
         """Average the gradient from each selected client."""
         message = f"[Round: {str(self._round).zfill(4)}] Aggregate gradients of {len(sampled_client_indices)} clients...!"
         print(message)
@@ -301,10 +303,7 @@ class Server(object):
         # Gather gradients from clients
         gradient_sketch: CSVec = CSVec(self.sketch_d, self.sketch_c, self.sketch_r)
         for it, idx in tqdm(enumerate(sampled_client_indices), leave=False):
-            # Use sketch to compress the gradients from the clients
-            concated_gradient = torch.cat(
-                [param.grad.flatten() for param in self.clients[idx].model.parameters()]
-            )
+            concated_gradient = torch.cat([v.flatten() for _, v in self.clients[idx].grad_dict.items()])
             sketch: CSVec = CSVec(self.sketch_d, self.sketch_c, self.sketch_r)
             compressed_gradient_table: torch.Tensor = sketch.compress(concated_gradient)
             gradient_sketch.accumulateTable(
@@ -317,9 +316,8 @@ class Server(object):
         uncompressed_gradients = CSVec(
             self.sketch_d, self.sketch_c, self.sketch_r
         ).uncompress(gradient_with_error_table, k=self.sketch_k)
-        gradient_dict: dict = self.unmarshall(
-            uncompressed_gradients, self.model.state_dict()
-        )
+        gradient_dict: dict = self.recover_gradient(
+            uncompressed_gradients, self.model)
         # Update the error sketch
         self.error.table = gradient_with_error_table - CSVec(
             self.sketch_d, self.sketch_c, self.sketch_r
@@ -327,7 +325,7 @@ class Server(object):
 
         # Update the model with the gradients
         for k, v in self.model.state_dict().items():
-            v += gradient_dict[k]
+            v -= gradient_dict[k]
 
         message = f"[Round: {str(self._round).zfill(4)}] ...updated weights of {len(sampled_client_indices)} clients are successfully averaged!"
         print(message)
@@ -342,9 +340,19 @@ class Server(object):
         for k, v in state_dict.items():
             shape = v.shape
             size = v.numel()
+            print(f"size in unmarshall {size}")
             state_dict_restored[k] = tensor[index : index + size].reshape(shape)
             index += size
         return state_dict_restored
+
+    def recover_gradient(self, tensor: torch.Tensor, model: torch.nn.Module):
+        name_to_gradients: dict[str, torch.Tensor] = {}
+        for name, param in model.named_parameters():
+            print(name)
+            name_to_gradients[name] = tensor[: param.numel()].reshape(param.shape)
+            tensor = tensor[param.numel() :]
+        return name_to_gradients
+
 
     def evaluate_selected_models(self, sampled_client_indices):
         print(message); logging.info(message)
