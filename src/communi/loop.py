@@ -2,6 +2,8 @@ import socket
 import os
 import sys
 import time
+import numpy
+import torch
 from kafka import KafkaProducer, KafkaConsumer,TopicPartition
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -40,29 +42,30 @@ consumer = KafkaConsumer(**consumer_conf)
 # consumer.subscribe(consumer_topics)
 consumer.assign(consumer_tps)
 print("client init done!")
+model_size = 100000
+# while 1:
+start_time = time.perf_counter()
+model = torch.randn((model_size,))
+print(f"Loop {counter} produce begins")
+# from IPython import embed; embed()
 
-while 1:
-    start_time = time.perf_counter()
-    print(f"Loop {counter} produce begins")
-    from IPython import embed; embed()
+producer.send(topic="LOOPTEST", key=f"LOOPTEST_KEY".encode('utf-8'), value=model[1:])
 
-    # producer.send(topic="LOOPTEST", key=f"LOOPTEST_KEY".encode('utf-8'), value="LOOPTEST_VALUE")
+print(f"Loop {counter} produce ends")
 
-    print(f"Loop {counter} produce ends")
+print(f"Loop {counter} consume begins")
 
-    print(f"Loop {counter} consume begins")
-
-    # msgs = consumer.poll(timeout_ms=1000, max_records=1, update_offsets=True)
-    # print(msgs)
-    # consumer.commit()
-    print(f"Loop {counter} consume ends")
+# msgs = consumer.poll(timeout_ms=1000, max_records=1, update_offsets=True)
+# print(msgs)
+# consumer.commit()
+print(f"Loop {counter} consume ends")
 
 
 
-    counter += 1
-    end_time = time.perf_counter()  # record the end time
-    elapsed_time = int((end_time - start_time) * 1000)  # calculate elapsed time in milliseconds
-    print(f"Loop {counter} ends, took {elapsed_time} seconds to execute.")
-    print("")
-    time.sleep(2.0)
+counter += 1
+end_time = time.perf_counter()  # record the end time
+elapsed_time = int((end_time - start_time) * 1000)  # calculate elapsed time in milliseconds
+print(f"Loop {counter} ends, took {elapsed_time} seconds to execute.")
+print("")
+time.sleep(2.0)
 

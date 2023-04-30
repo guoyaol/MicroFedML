@@ -34,3 +34,5 @@ os.system("kubectl apply -n kafka -f ../client_serverless/deployment.yaml ")
 # kubectl exec -it -n kafka communi-deployment-0 sh
 
 # kubectl describe -n kafka 
+
+# aws eks update-kubeconfig --region us-east-2 --name my-cluster
