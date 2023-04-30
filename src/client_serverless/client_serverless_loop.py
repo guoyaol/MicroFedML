@@ -14,6 +14,7 @@ import logging
 cli_id = int(os.environ.get('HOSTNAME')[-1]) #int(sys.argv[1])
 server_address = None#(SRV, PORT)
 cli = Client(cli_id, server_address, serverless = True)
+loop_time_mean = 0.0
 while 1:
     start_time = time.perf_counter()
     print(f"Client {cli_id} Loop {counter} begins")
@@ -26,6 +27,9 @@ while 1:
     counter += 1
     end_time = time.perf_counter()  # record the end time
     elapsed_time = int((end_time - start_time) * 1000)  # calculate elapsed time in milliseconds
-    print(f"Client Loop {cli_id} ends, took {elapsed_time} mili-seconds to execute.")
+    if counter > 3:
+        loop_time_mean = ((counter - 4) * loop_time_mean + elapsed_time) / (counter - 3)
+    print(f"Client Loop {cli_id} ends, took {elapsed_time} mili-seconds to execute. Mean of all: {loop_time_mean}")
+    
     print("")
 

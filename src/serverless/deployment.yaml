@@ -22,7 +22,7 @@ spec:
         - name: LISTEN_PORT
           value: "30152"
         - name: CLIENTS
-          value: "2"
+          value: "10"
 ---
 # apiVersion: v1
 # kind: Service
