@@ -17,8 +17,8 @@ class Client(object):
     """
     def __init__(self, client_id, server_address, serverless = False):
         self.id = client_id
-        self.model = client_id % 10
-        self.model_size = int(os.environ.get('MODEL_SIZE'))#1000000
+        self.model = client_id % 10 #TODO change to real model
+        self.model_size = int(os.environ.get('MODEL_SIZE'))#1000000 #TODO change to real model size
         self.server_address = server_address
         
         
@@ -71,36 +71,38 @@ class Client(object):
     
     def marshall(self, model):
         return (str(model) * self.model_size).encode('utf-8')
+    #todo: change to real model
 
     def unmarshall(self, blob):
         return blob.decode('utf-8')
+    #todo: change to real model
 
-    def get_param_from_server(self):
-        print(f"Client {self.id} start receiving!")
-        amount_received = 0
-        amount_expected = self.model_size
+    # def get_param_from_server(self):
+    #     print(f"Client {self.id} start receiving!")
+    #     amount_received = 0
+    #     amount_expected = self.model_size
 
-        while amount_received < amount_expected:
-            data = self.unmarshall(self.sock.recv(64))
-            amount_received += len(data)
-        self.model = int(data[0])
-        self.sock.close()
-        print(f"Client {self.id} done receiving!")
+    #     while amount_received < amount_expected:
+    #         data = self.unmarshall(self.sock.recv(64))
+    #         amount_received += len(data)
+    #     self.model = int(data[0])
+    #     self.sock.close()
+    #     print(f"Client {self.id} done receiving!")
 
-    def send_param_to_server(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        while 1:
-            try:
-                self.sock.connect(self.server_address)
-                break
-            except Exception as e:
-                print(f"Client {self.id} Cannot connect to the server,", e)
+    # def send_param_to_server(self):
+    #     self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     while 1:
+    #         try:
+    #             self.sock.connect(self.server_address)
+    #             break
+    #         except Exception as e:
+    #             print(f"Client {self.id} Cannot connect to the server,", e)
                  
-        print(f"Client {self.id} start sending!")
-        msg = self.marshall(self.model)
-        self.sock.sendall(msg)
+    #     print(f"Client {self.id} start sending!")
+    #     msg = self.marshall(self.model)
+    #     self.sock.sendall(msg)
         
-        print(f"Client {self.id} done sending!")
+    #     print(f"Client {self.id} done sending!")
     
     def send_param_to_kafka(self):
 
@@ -108,6 +110,7 @@ class Client(object):
         # large_tensor = torch.randn(1000, 1000)
         print(f"Client {self.id} start sending to kafka!")
         msg = self.marshall(self.model)
+        #TODO: how to send tensor
         shard_size = len(msg) // self.shards
         # Convert the tensor to a JSON string
         # tensor_str = json.dumps(large_tensor.numpy().tolist())
@@ -137,6 +140,8 @@ class Client(object):
         messages = [model_shards[shard_name][0].value.decode('utf-8') for shard_name in self.consumer_tps]
         for msg in messages:
             print(len(msg))
+        #TODO: how to send tensor
+        #TODO: concatenate shards to a real model
         self.model = messages[0][0]
         print(f'Receiving model from kafka done!')
 
