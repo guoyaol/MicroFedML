@@ -11,10 +11,10 @@ data_config:
   iid: False
 ---
 fed_config:
-  C: 0.1
-  K: 100
-  R: 500
-  E: 10
+  C: 1.0
+  K: 10
+  R: 5
+  E: 1
   B: 10
   criterion: torch.nn.CrossEntropyLoss
   optimizer: torch.optim.SGD
