@@ -1,6 +1,7 @@
 import gc
 import pickle
 import logging
+from collections import OrderedDict
 
 import torch
 import torch.nn as nn
@@ -31,6 +32,7 @@ class Client(object):
         self.test_data = local_test_datasets[client_id]
         self.device = device
         self.__model = None
+        self.model_tensor = None
 
     def read_data(id, data_path):
         """Read local data from pickle file."""
@@ -65,6 +67,7 @@ class Client(object):
         """Update local model using local dataset."""
         self.model.train()
         self.model.to(self.device)
+        self.grad_dict: dict = OrderedDict()
 
         optimizer = eval(self.optimizer)(self.model.parameters(), **self.optim_config)
         for e in range(self.local_epoch):
@@ -76,10 +79,25 @@ class Client(object):
                 loss = eval(self.criterion)()(outputs, labels)
 
                 loss.backward()
+                # Collect gradients during update
+                for name, param in self.model.named_parameters():
+                    if param.grad is not None:
+                        if name not in self.grad_dict.keys():
+                            self.grad_dict[name] = param.grad
+                        else:
+                            self.grad_dict[name] += param.grad
                 optimizer.step() 
 
                 if self.device == "cuda": torch.cuda.empty_cache()               
         self.model.to("cpu")
+        # self.grad = get_grad(xxx)
+        # self.compressed_grad = self.compress(self.grad)
+        # self.model_tensor =  self.compress(self.marshall(self.model))
+
+    def marshall(self, state_dict):
+        # convert the state_dict to a tensor
+        tensor = torch.cat([v.flatten() for v in state_dict.values()])
+        return tensor
 
     def client_evaluate_train(self):
         """Evaluate local model using local dataset (same as training set for convenience)."""

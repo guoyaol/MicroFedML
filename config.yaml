@@ -1,3 +1,4 @@
+# TODO: add sketch config
 global_config:
   seed: 5959
   device: "cpu"
@@ -20,7 +21,7 @@ fed_config:
 ---
 optim_config:
   lr: 0.01
-  momentum: 0.9
+  momentum: 0
 ---
 init_config:
   init_type: "xavier"
@@ -44,3 +45,8 @@ log_config:
   log_name:  "FL.log"
   tb_port: 5252
   tb_host: "0.0.0.0"
+---
+sketch_config:
+  sketch_c: 500000
+  sketch_r: 5
+  k: 50000
