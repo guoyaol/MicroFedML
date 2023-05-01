@@ -59,6 +59,7 @@ class Server(object):
         fed_config={},
         optim_config={},
         sketch_config={},
+        num_server=3,
     ):
         self.clients = []
         self._round = 0
@@ -89,7 +90,7 @@ class Server(object):
         self.learning_rate: float = optim_config["lr"]
 
         # self.sketch_d: int = sum(p.numel() for p in self.model.parameters())
-        self.num_server = 3
+        self.num_server = num_server
         self.whole_model_size: int = sum(p.numel() for p in self.model.parameters())
         self.sketch_d = split_integer_into_parts(self.whole_model_size, self.num_server)
 

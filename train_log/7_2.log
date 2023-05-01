@@ -1,0 +1,605 @@
+nohup: ignoring input
+TensorFlow installation not found - running with reduced feature set.
+/opt/conda/envs/sketch/lib/python3.10/site-packages/tensorboard_data_server/bin/server: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.33' not found (required by /opt/conda/envs/sketch/lib/python3.10/site-packages/tensorboard_data_server/bin/server)
+/opt/conda/envs/sketch/lib/python3.10/site-packages/tensorboard_data_server/bin/server: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by /opt/conda/envs/sketch/lib/python3.10/site-packages/tensorboard_data_server/bin/server)
+/opt/conda/envs/sketch/lib/python3.10/site-packages/tensorboard_data_server/bin/server: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.32' not found (required by /opt/conda/envs/sketch/lib/python3.10/site-packages/tensorboard_data_server/bin/server)
+Address already in use
+Port 5252 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+[WELCOME] Unfolding configurations...!
+{'global_config': {'seed': 5959, 'device': 'cpu', 'is_mp': True}}
+{'data_config': {'data_path': './data/', 'dataset_name': 'MNIST', 'num_shards': 200, 'iid': False}}
+{'fed_config': {'C': 1.0, 'K': 10, 'R': 5, 'E': 1, 'B': 10, 'criterion': 'torch.nn.CrossEntropyLoss', 'optimizer': 'torch.optim.SGD'}}
+{'optim_config': {'lr': 0.005, 'momentum': 0}}
+{'init_config': {'init_type': 'xavier', 'init_gain': 1.0, 'gpu_ids': []}}
+{'model_config': {'name': 'CNN', 'in_channels': 1, 'hidden_channels': 32, 'num_hiddens': 512, 'num_classes': 10}}
+{'log_config': {'log_path': './log/2023-05-01_03:33:10', 'log_name': 'FL.log', 'tb_port': 5252, 'tb_host': '0.0.0.0'}}
+{'sketch_config': {'sketch_c': 500000, 'sketch_r': 5, 'k': 50000}}
+
+currently using 7 server(s)
+[Round: 0000] ...successfully initialized model (# parameters: 1662752)!
+0it [00:00, ?it/s]                  [Round: 0000] ...successfully finished setup of all 10 clients!
+  0%|          | 0/10 [00:00<?, ?it/s] 50%|█████     | 5/10 [00:00<00:00, 41.69it/s]100%|██████████| 10/10 [00:00<00:00, 42.58it/s]                                               [Round: 0000] ...successfully transmitted models to all 10 clients!
+[Round: 0001] Select clients...!
+  0%|          | 0/10 [00:00<?, ?it/s] 60%|██████    | 6/10 [00:00<00:00, 53.37it/s]                                              [Round: 0001] ...successfully transmitted models to 10 selected clients!
+[Round: 0001] Evaluate selected 10 clients' models...!
+	[Client 0002] ...finished evaluation!            
+	=> client loss(test): 2.3000            
+	=> client accuracy(test): 8.80%
+
+	[Client 0001] ...finished evaluation!            
+	=> client loss(test): 2.3027            
+	=> client accuracy(test): 7.00%
+
+	[Client 0000] ...finished evaluation!            
+	=> client loss(test): 2.3108            
+	=> client accuracy(test): 6.50%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(test): 2.2986            
+	=> client accuracy(test): 11.80%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(test): 2.3011            
+	=> client accuracy(test): 8.60%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(test): 2.2977            
+	=> client accuracy(test): 11.00%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(test): 2.3001            
+	=> client accuracy(test): 10.10%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(test): 2.3033            
+	=> client accuracy(test): 8.60%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(test): 2.3012            
+	=> client accuracy(test): 9.70%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(test): 2.3015            
+	=> client accuracy(test): 9.00%
+
+[Round: 0001] Start updating selected client 0000...!
+[Round: 0001] Start updating selected client 0001...![Round: 0001] Start updating selected client 0002...!
+
+[Round: 0001] ...client 0000 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Start updating selected client 0003...!
+[Round: 0001] ...client 0002 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Start updating selected client 0004...!
+[Round: 0001] ...client 0001 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Start updating selected client 0005...!
+[Round: 0001] ...client 0003 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Start updating selected client 0006...!
+[Round: 0001] ...client 0005 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Start updating selected client 0007...!
+[Round: 0001] ...client 0004 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Start updating selected client 0008...!
+[Round: 0001] ...client 0006 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Start updating selected client 0009...!
+[Round: 0001] ...client 0007 is selected and updated (with total sample size: 6000)!
+[Round: 0001] ...client 0008 is selected and updated (with total sample size: 6000)!
+[Round: 0001] ...client 0009 is selected and updated (with total sample size: 6000)!
+[Round: 0001] Evaluate selected 10 clients' models...!
+	[Client 0000] ...finished evaluation!            
+	=> client loss(train): 0.3785            
+	=> client accuracy(train): 89.62%
+
+	[Client 0001] ...finished evaluation!            
+	=> client loss(train): 0.5634            
+	=> client accuracy(train): 79.68%
+
+	[Client 0002] ...finished evaluation!            
+	=> client loss(train): 0.4304            
+	=> client accuracy(train): 87.27%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(train): 0.4957            
+	=> client accuracy(train): 82.72%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(train): 0.5670            
+	=> client accuracy(train): 81.05%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(train): 0.4351            
+	=> client accuracy(train): 87.88%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(train): 0.5061            
+	=> client accuracy(train): 83.57%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(train): 0.4548            
+	=> client accuracy(train): 86.82%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(train): 0.4749            
+	=> client accuracy(train): 86.52%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(train): 0.4810            
+	=> client accuracy(train): 84.97%
+
+sampled_client_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[Round: 0001] Aggregate gradients of 10 clients...!
+0it [00:00, ?it/s]1it [00:00,  2.68it/s]2it [00:00,  2.51it/s]3it [00:01,  2.39it/s]4it [00:01,  2.37it/s]5it [00:02,  2.23it/s]6it [00:02,  2.31it/s]7it [00:02,  2.49it/s]8it [00:03,  2.57it/s]9it [00:03,  2.66it/s]10it [00:03,  2.66it/s]                       0it [00:00, ?it/s]1it [00:00,  2.68it/s]2it [00:00,  2.71it/s]3it [00:00,  3.17it/s]4it [00:01,  3.10it/s]5it [00:01,  3.07it/s]6it [00:01,  3.15it/s]7it [00:02,  3.19it/s]8it [00:02,  3.22it/s]9it [00:02,  3.29it/s]10it [00:03,  3.00it/s]                       0it [00:00, ?it/s]1it [00:00,  2.96it/s]2it [00:00,  2.87it/s]3it [00:01,  2.76it/s]4it [00:01,  2.57it/s]5it [00:01,  2.50it/s]6it [00:02,  2.43it/s]7it [00:02,  2.45it/s]8it [00:03,  2.47it/s]9it [00:03,  2.43it/s]10it [00:03,  2.44it/s]                       0it [00:00, ?it/s]1it [00:00,  2.49it/s]2it [00:00,  2.48it/s]3it [00:01,  2.46it/s]4it [00:01,  2.46it/s]5it [00:02,  2.49it/s]6it [00:02,  2.50it/s]7it [00:02,  2.50it/s]8it [00:03,  2.52it/s]9it [00:03,  2.54it/s]10it [00:03,  2.59it/s]                       0it [00:00, ?it/s]1it [00:00,  2.81it/s]2it [00:00,  2.75it/s]3it [00:01,  2.76it/s]4it [00:01,  2.72it/s]5it [00:01,  2.70it/s]6it [00:02,  2.65it/s]7it [00:02,  2.64it/s]8it [00:02,  2.63it/s]9it [00:03,  2.62it/s]10it [00:03,  2.55it/s]                       0it [00:00, ?it/s]1it [00:00,  2.75it/s]2it [00:00,  2.75it/s]3it [00:01,  2.73it/s]4it [00:01,  2.63it/s]5it [00:01,  2.55it/s]6it [00:02,  2.51it/s]7it [00:02,  2.50it/s]8it [00:03,  2.74it/s]9it [00:03,  2.68it/s]10it [00:03,  2.61it/s]                       0it [00:00, ?it/s]1it [00:00,  2.55it/s]2it [00:00,  2.47it/s]3it [00:01,  2.51it/s]4it [00:01,  2.44it/s]5it [00:02,  2.42it/s]6it [00:02,  2.42it/s]7it [00:02,  2.44it/s]8it [00:03,  2.46it/s]9it [00:03,  2.51it/s]10it [00:04,  2.50it/s]                       conv1.weight
+conv2.weight
+fc1.weight
+fc2.weight
+[Round: 0001] ...updated weights of 10 clients are successfully averaged!
+[Round: 0001] Evaluate global model's performance...!                
+	[Server] ...finished evaluation!                
+	=> Loss: 0.4383                
+	=> Accuracy: 88.14%
+
+[Round: 0002] Select clients...!
+  0%|          | 0/10 [00:00<?, ?it/s] 60%|██████    | 6/10 [00:00<00:00, 47.54it/s]                                              [Round: 0002] ...successfully transmitted models to 10 selected clients!
+[Round: 0002] Evaluate selected 10 clients' models...!
+	[Client 0000] ...finished evaluation!            
+	=> client loss(test): 0.3896            
+	=> client accuracy(test): 90.30%
+
+	[Client 0002] ...finished evaluation!            
+	=> client loss(test): 0.4244            
+	=> client accuracy(test): 87.70%
+
+	[Client 0001] ...finished evaluation!            
+	=> client loss(test): 0.4102            
+	=> client accuracy(test): 88.10%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(test): 0.4988            
+	=> client accuracy(test): 85.20%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(test): 0.4781            
+	=> client accuracy(test): 86.90%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(test): 0.3935            
+	=> client accuracy(test): 89.70%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(test): 0.3941            
+	=> client accuracy(test): 91.10%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(test): 0.4250            
+	=> client accuracy(test): 89.10%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(test): 0.4930            
+	=> client accuracy(test): 86.60%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(test): 0.4766            
+	=> client accuracy(test): 86.70%
+
+[Round: 0002] Start updating selected client 0000...!
+[Round: 0002] Start updating selected client 0001...!
+[Round: 0002] Start updating selected client 0002...!
+[Round: 0002] ...client 0000 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Start updating selected client 0003...!
+[Round: 0002] ...client 0002 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Start updating selected client 0004...!
+[Round: 0002] ...client 0001 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Start updating selected client 0005...!
+[Round: 0002] ...client 0003 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Start updating selected client 0006...!
+[Round: 0002] ...client 0004 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Start updating selected client 0007...!
+[Round: 0002] ...client 0005 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Start updating selected client 0008...!
+[Round: 0002] ...client 0006 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Start updating selected client 0009...!
+[Round: 0002] ...client 0007 is selected and updated (with total sample size: 6000)!
+[Round: 0002] ...client 0008 is selected and updated (with total sample size: 6000)!
+[Round: 0002] ...client 0009 is selected and updated (with total sample size: 6000)!
+[Round: 0002] Evaluate selected 10 clients' models...!
+	[Client 0002] ...finished evaluation!            
+	=> client loss(train): 0.2791            
+	=> client accuracy(train): 91.95%
+
+	[Client 0001] ...finished evaluation!            
+	=> client loss(train): 0.2778            
+	=> client accuracy(train): 91.80%
+
+	[Client 0000] ...finished evaluation!            
+	=> client loss(train): 0.2720            
+	=> client accuracy(train): 91.97%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(train): 0.3030            
+	=> client accuracy(train): 90.20%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(train): 0.2535            
+	=> client accuracy(train): 92.65%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(train): 0.3307            
+	=> client accuracy(train): 88.98%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(train): 0.2546            
+	=> client accuracy(train): 92.75%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(train): 0.3250            
+	=> client accuracy(train): 89.68%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(train): 0.2925            
+	=> client accuracy(train): 91.50%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(train): 0.2649            
+	=> client accuracy(train): 92.40%
+
+sampled_client_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[Round: 0002] Aggregate gradients of 10 clients...!
+0it [00:00, ?it/s]1it [00:00,  2.99it/s]2it [00:00,  2.89it/s]3it [00:01,  2.70it/s]4it [00:01,  2.47it/s]5it [00:01,  2.39it/s]6it [00:02,  2.30it/s]7it [00:02,  2.32it/s]8it [00:03,  2.39it/s]9it [00:03,  2.46it/s]10it [00:03,  2.60it/s]                       0it [00:00, ?it/s]1it [00:00,  2.39it/s]2it [00:00,  2.53it/s]3it [00:01,  2.59it/s]4it [00:01,  2.61it/s]5it [00:01,  2.65it/s]6it [00:02,  2.73it/s]7it [00:02,  2.68it/s]8it [00:03,  2.38it/s]9it [00:03,  2.29it/s]10it [00:04,  2.28it/s]                       0it [00:00, ?it/s]1it [00:00,  2.25it/s]2it [00:00,  2.32it/s]3it [00:01,  2.61it/s]4it [00:01,  2.65it/s]5it [00:01,  2.72it/s]6it [00:02,  2.72it/s]7it [00:02,  2.70it/s]8it [00:02,  2.85it/s]9it [00:03,  2.94it/s]10it [00:03,  3.39it/s]                       0it [00:00, ?it/s]1it [00:00,  3.32it/s]2it [00:00,  3.21it/s]3it [00:00,  2.92it/s]4it [00:01,  2.94it/s]5it [00:01,  3.09it/s]6it [00:01,  3.31it/s]7it [00:02,  3.18it/s]8it [00:02,  3.17it/s]9it [00:02,  3.07it/s]10it [00:03,  3.09it/s]                       0it [00:00, ?it/s]1it [00:00,  2.66it/s]2it [00:00,  2.52it/s]3it [00:01,  2.47it/s]4it [00:01,  2.46it/s]5it [00:02,  2.49it/s]6it [00:02,  2.44it/s]7it [00:02,  2.50it/s]8it [00:03,  2.55it/s]9it [00:03,  2.54it/s]10it [00:03,  2.51it/s]                       0it [00:00, ?it/s]1it [00:00,  2.40it/s]2it [00:00,  2.51it/s]3it [00:01,  2.54it/s]4it [00:01,  2.53it/s]5it [00:01,  2.66it/s]6it [00:02,  2.68it/s]7it [00:02,  2.66it/s]8it [00:03,  2.66it/s]9it [00:03,  2.63it/s]10it [00:03,  2.67it/s]                       0it [00:00, ?it/s]1it [00:00,  2.40it/s]2it [00:00,  2.43it/s]3it [00:01,  2.59it/s]4it [00:01,  2.54it/s]5it [00:01,  2.49it/s]6it [00:02,  2.53it/s]7it [00:02,  2.56it/s]8it [00:03,  2.56it/s]9it [00:03,  2.60it/s]10it [00:03,  2.57it/s]                       conv1.weight
+conv2.weight
+fc1.weight
+fc2.weight
+[Round: 0002] ...updated weights of 10 clients are successfully averaged!
+[Round: 0002] Evaluate global model's performance...!                
+	[Server] ...finished evaluation!                
+	=> Loss: 0.2552                
+	=> Accuracy: 92.50%
+
+[Round: 0003] Select clients...!
+  0%|          | 0/10 [00:00<?, ?it/s] 40%|████      | 4/10 [00:00<00:00, 33.68it/s] 80%|████████  | 8/10 [00:00<00:00, 32.00it/s]                                              [Round: 0003] ...successfully transmitted models to 10 selected clients!
+[Round: 0003] Evaluate selected 10 clients' models...!
+	[Client 0000] ...finished evaluation!            
+	=> client loss(test): 0.2141            
+	=> client accuracy(test): 94.50%
+
+	[Client 0002] ...finished evaluation!            
+	=> client loss(test): 0.2474            
+	=> client accuracy(test): 92.80%
+
+	[Client 0001] ...finished evaluation!            
+	=> client loss(test): 0.2342            
+	=> client accuracy(test): 92.70%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(test): 0.2885            
+	=> client accuracy(test): 90.90%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(test): 0.3165            
+	=> client accuracy(test): 90.40%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(test): 0.2139            
+	=> client accuracy(test): 93.20%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(test): 0.2099            
+	=> client accuracy(test): 94.70%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(test): 0.2490            
+	=> client accuracy(test): 93.40%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(test): 0.2966            
+	=> client accuracy(test): 91.40%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(test): 0.2819            
+	=> client accuracy(test): 91.00%
+
+[Round: 0003] Start updating selected client 0000...![Round: 0003] Start updating selected client 0001...!
+[Round: 0003] Start updating selected client 0002...!
+
+[Round: 0003] ...client 0001 is selected and updated (with total sample size: 6000)!
+[Round: 0003] Start updating selected client 0003...![Round: 0003] ...client 0000 is selected and updated (with total sample size: 6000)!
+
+[Round: 0003] Start updating selected client 0004...!
+[Round: 0003] ...client 0002 is selected and updated (with total sample size: 6000)!
+[Round: 0003] Start updating selected client 0005...!
+[Round: 0003] ...client 0004 is selected and updated (with total sample size: 6000)!
+[Round: 0003] Start updating selected client 0006...!
+[Round: 0003] ...client 0003 is selected and updated (with total sample size: 6000)!
+[Round: 0003] Start updating selected client 0007...!
+[Round: 0003] ...client 0005 is selected and updated (with total sample size: 6000)!
+[Round: 0003] Start updating selected client 0008...!
+[Round: 0003] ...client 0006 is selected and updated (with total sample size: 6000)!
+[Round: 0003] Start updating selected client 0009...!
+[Round: 0003] ...client 0007 is selected and updated (with total sample size: 6000)!
+[Round: 0003] ...client 0008 is selected and updated (with total sample size: 6000)!
+[Round: 0003] ...client 0009 is selected and updated (with total sample size: 6000)!
+[Round: 0003] Evaluate selected 10 clients' models...!
+	[Client 0002] ...finished evaluation!            
+	=> client loss(train): 0.2161            
+	=> client accuracy(train): 93.60%
+
+	[Client 0000] ...finished evaluation!            
+	=> client loss(train): 0.2120            
+	=> client accuracy(train): 93.53%
+
+	[Client 0001] ...finished evaluation!            
+	=> client loss(train): 0.2522            
+	=> client accuracy(train): 92.40%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(train): 0.2074            
+	=> client accuracy(train): 93.92%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(train): 0.2133            
+	=> client accuracy(train): 93.48%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(train): 0.2184            
+	=> client accuracy(train): 93.28%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(train): 0.2016            
+	=> client accuracy(train): 93.95%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(train): 0.2194            
+	=> client accuracy(train): 93.32%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(train): 0.2163            
+	=> client accuracy(train): 93.53%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(train): 0.2235            
+	=> client accuracy(train): 92.93%
+
+sampled_client_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[Round: 0003] Aggregate gradients of 10 clients...!
+0it [00:00, ?it/s]1it [00:00,  2.38it/s]2it [00:00,  2.26it/s]3it [00:01,  2.27it/s]4it [00:01,  2.30it/s]5it [00:02,  2.34it/s]6it [00:02,  2.42it/s]7it [00:02,  2.38it/s]8it [00:03,  2.53it/s]9it [00:03,  2.41it/s]10it [00:04,  2.34it/s]                       0it [00:00, ?it/s]1it [00:00,  2.36it/s]2it [00:00,  2.46it/s]3it [00:01,  2.66it/s]4it [00:01,  2.57it/s]5it [00:02,  2.42it/s]6it [00:02,  2.45it/s]7it [00:02,  2.70it/s]8it [00:03,  2.75it/s]9it [00:03,  2.60it/s]10it [00:03,  2.68it/s]                       0it [00:00, ?it/s]1it [00:00,  2.88it/s]2it [00:00,  2.47it/s]3it [00:01,  2.24it/s]4it [00:01,  2.22it/s]5it [00:02,  2.10it/s]6it [00:02,  1.87it/s]7it [00:03,  1.93it/s]8it [00:03,  2.02it/s]9it [00:04,  2.18it/s]10it [00:04,  2.24it/s]                       0it [00:00, ?it/s]1it [00:00,  2.05it/s]2it [00:00,  2.21it/s]3it [00:01,  2.26it/s]4it [00:01,  2.47it/s]5it [00:02,  2.55it/s]6it [00:02,  2.67it/s]7it [00:02,  2.65it/s]8it [00:03,  2.62it/s]9it [00:03,  2.57it/s]10it [00:04,  2.51it/s]                       0it [00:00, ?it/s]1it [00:00,  1.97it/s]2it [00:00,  2.19it/s]3it [00:01,  2.18it/s]4it [00:01,  2.19it/s]5it [00:02,  2.21it/s]6it [00:02,  2.15it/s]7it [00:03,  2.22it/s]8it [00:03,  2.23it/s]9it [00:04,  2.35it/s]10it [00:04,  2.36it/s]                       0it [00:00, ?it/s]1it [00:00,  2.01it/s]2it [00:00,  2.12it/s]3it [00:01,  2.10it/s]4it [00:01,  2.24it/s]5it [00:02,  2.16it/s]6it [00:02,  2.18it/s]7it [00:03,  2.32it/s]8it [00:03,  2.35it/s]9it [00:03,  2.39it/s]10it [00:04,  2.37it/s]                       0it [00:00, ?it/s]1it [00:00,  2.41it/s]2it [00:00,  2.38it/s]3it [00:01,  2.48it/s]4it [00:01,  2.45it/s]5it [00:02,  2.45it/s]6it [00:02,  2.48it/s]7it [00:02,  2.49it/s]8it [00:03,  2.43it/s]9it [00:03,  2.44it/s]10it [00:04,  2.32it/s]                       conv1.weight
+conv2.weight
+fc1.weight
+fc2.weight
+[Round: 0003] ...updated weights of 10 clients are successfully averaged!
+[Round: 0003] Evaluate global model's performance...!                
+	[Server] ...finished evaluation!                
+	=> Loss: 0.1932                
+	=> Accuracy: 94.22%
+
+[Round: 0004] Select clients...!
+  0%|          | 0/10 [00:00<?, ?it/s] 30%|███       | 3/10 [00:00<00:00, 29.60it/s] 60%|██████    | 6/10 [00:00<00:00, 27.59it/s]                                              [Round: 0004] ...successfully transmitted models to 10 selected clients!
+[Round: 0004] Evaluate selected 10 clients' models...!
+	[Client 0001] ...finished evaluation!            
+	=> client loss(test): 0.1771            
+	=> client accuracy(test): 94.70%
+
+	[Client 0002] ...finished evaluation!            
+	=> client loss(test): 0.1727            
+	=> client accuracy(test): 95.20%
+
+	[Client 0000] ...finished evaluation!            
+	=> client loss(test): 0.1649            
+	=> client accuracy(test): 95.60%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(test): 0.1504            
+	=> client accuracy(test): 94.70%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(test): 0.2163            
+	=> client accuracy(test): 92.90%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(test): 0.2526            
+	=> client accuracy(test): 92.00%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(test): 0.1522            
+	=> client accuracy(test): 96.10%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(test): 0.1940            
+	=> client accuracy(test): 94.60%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(test): 0.2291            
+	=> client accuracy(test): 93.50%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(test): 0.2225            
+	=> client accuracy(test): 92.90%
+
+[Round: 0004] Start updating selected client 0000...!
+[Round: 0004] Start updating selected client 0001...!
+[Round: 0004] Start updating selected client 0002...!
+[Round: 0004] ...client 0001 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Start updating selected client 0003...!
+[Round: 0004] ...client 0000 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Start updating selected client 0004...!
+[Round: 0004] ...client 0002 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Start updating selected client 0005...!
+[Round: 0004] ...client 0003 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Start updating selected client 0006...!
+[Round: 0004] ...client 0005 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Start updating selected client 0007...!
+[Round: 0004] ...client 0004 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Start updating selected client 0008...!
+[Round: 0004] ...client 0006 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Start updating selected client 0009...!
+[Round: 0004] ...client 0007 is selected and updated (with total sample size: 6000)!
+[Round: 0004] ...client 0008 is selected and updated (with total sample size: 6000)!
+[Round: 0004] ...client 0009 is selected and updated (with total sample size: 6000)!
+[Round: 0004] Evaluate selected 10 clients' models...!
+	[Client 0001] ...finished evaluation!            
+	=> client loss(train): 0.1688            
+	=> client accuracy(train): 94.95%
+
+	[Client 0000] ...finished evaluation!            
+	=> client loss(train): 0.1806            
+	=> client accuracy(train): 94.82%
+
+	[Client 0002] ...finished evaluation!            
+	=> client loss(train): 0.2084            
+	=> client accuracy(train): 94.02%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(train): 0.1880            
+	=> client accuracy(train): 94.87%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(train): 0.1602            
+	=> client accuracy(train): 95.15%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(train): 0.1981            
+	=> client accuracy(train): 94.02%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(train): 0.1794            
+	=> client accuracy(train): 94.17%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(train): 0.1638            
+	=> client accuracy(train): 95.30%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(train): 0.1824            
+	=> client accuracy(train): 94.60%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(train): 0.1549            
+	=> client accuracy(train): 95.52%
+
+sampled_client_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[Round: 0004] Aggregate gradients of 10 clients...!
+0it [00:00, ?it/s]1it [00:00,  3.60it/s]2it [00:00,  3.22it/s]3it [00:01,  2.81it/s]4it [00:01,  2.69it/s]5it [00:01,  2.82it/s]6it [00:02,  2.66it/s]7it [00:02,  2.54it/s]8it [00:02,  2.56it/s]9it [00:03,  2.64it/s]10it [00:03,  2.85it/s]                       0it [00:00, ?it/s]1it [00:00,  2.18it/s]2it [00:01,  1.93it/s]3it [00:01,  1.88it/s]4it [00:02,  1.91it/s]5it [00:02,  2.13it/s]6it [00:02,  2.27it/s]7it [00:03,  2.41it/s]8it [00:03,  2.46it/s]9it [00:03,  2.45it/s]10it [00:04,  2.53it/s]                       0it [00:00, ?it/s]1it [00:00,  2.48it/s]2it [00:00,  2.23it/s]3it [00:01,  2.23it/s]4it [00:01,  2.12it/s]5it [00:02,  2.28it/s]6it [00:02,  2.51it/s]7it [00:02,  2.52it/s]8it [00:03,  2.38it/s]9it [00:03,  2.24it/s]10it [00:04,  2.20it/s]                       0it [00:00, ?it/s]1it [00:00,  1.97it/s]2it [00:00,  2.04it/s]3it [00:01,  2.14it/s]4it [00:01,  2.08it/s]5it [00:02,  2.41it/s]6it [00:02,  2.42it/s]7it [00:03,  2.43it/s]8it [00:03,  2.31it/s]9it [00:03,  2.29it/s]10it [00:04,  2.23it/s]                       0it [00:00, ?it/s]1it [00:00,  2.00it/s]2it [00:00,  2.12it/s]3it [00:01,  1.99it/s]4it [00:02,  1.93it/s]5it [00:02,  2.12it/s]6it [00:02,  2.26it/s]7it [00:03,  2.39it/s]8it [00:03,  2.31it/s]9it [00:04,  2.22it/s]10it [00:04,  2.17it/s]                       0it [00:00, ?it/s]1it [00:00,  1.81it/s]2it [00:00,  2.20it/s]3it [00:01,  2.28it/s]4it [00:01,  2.41it/s]5it [00:02,  2.24it/s]6it [00:02,  2.15it/s]7it [00:03,  2.10it/s]8it [00:03,  2.09it/s]9it [00:04,  2.03it/s]10it [00:04,  2.16it/s]                       0it [00:00, ?it/s]1it [00:00,  2.61it/s]2it [00:00,  2.50it/s]3it [00:01,  2.38it/s]4it [00:01,  2.24it/s]5it [00:02,  2.39it/s]6it [00:02,  2.48it/s]7it [00:02,  2.46it/s]8it [00:03,  2.48it/s]9it [00:03,  2.25it/s]10it [00:04,  1.99it/s]                       conv1.weight
+conv2.weight
+fc1.weight
+fc2.weight
+[Round: 0004] ...updated weights of 10 clients are successfully averaged!
+[Round: 0004] Evaluate global model's performance...!                
+	[Server] ...finished evaluation!                
+	=> Loss: 0.1595                
+	=> Accuracy: 95.21%
+
+[Round: 0005] Select clients...!
+  0%|          | 0/10 [00:00<?, ?it/s] 50%|█████     | 5/10 [00:00<00:00, 41.13it/s]100%|██████████| 10/10 [00:00<00:00, 39.75it/s]                                               [Round: 0005] ...successfully transmitted models to 10 selected clients!
+[Round: 0005] Evaluate selected 10 clients' models...!
+	[Client 0001] ...finished evaluation!            
+	=> client loss(test): 0.1445            
+	=> client accuracy(test): 95.60%
+
+	[Client 0000] ...finished evaluation!            
+	=> client loss(test): 0.1375            
+	=> client accuracy(test): 96.00%
+
+	[Client 0002] ...finished evaluation!            
+	=> client loss(test): 0.1477            
+	=> client accuracy(test): 95.60%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(test): 0.2152            
+	=> client accuracy(test): 93.50%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(test): 0.1763            
+	=> client accuracy(test): 94.60%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(test): 0.1242            
+	=> client accuracy(test): 96.50%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(test): 0.1280            
+	=> client accuracy(test): 96.70%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(test): 0.1634            
+	=> client accuracy(test): 95.10%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(test): 0.1862            
+	=> client accuracy(test): 94.50%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(test): 0.1723            
+	=> client accuracy(test): 94.00%
+
+[Round: 0005] Start updating selected client 0000...![Round: 0005] Start updating selected client 0001...!
+
+[Round: 0005] Start updating selected client 0002...!
+[Round: 0005] ...client 0002 is selected and updated (with total sample size: 6000)!
+[Round: 0005] Start updating selected client 0003...!
+[Round: 0005] ...client 0000 is selected and updated (with total sample size: 6000)!
+[Round: 0005] Start updating selected client 0004...!
+[Round: 0005] ...client 0001 is selected and updated (with total sample size: 6000)!
+[Round: 0005] Start updating selected client 0005...!
+[Round: 0005] ...client 0004 is selected and updated (with total sample size: 6000)!
+[Round: 0005] Start updating selected client 0006...!
+[Round: 0005] ...client 0003 is selected and updated (with total sample size: 6000)!
+[Round: 0005] ...client 0005 is selected and updated (with total sample size: 6000)!
+[Round: 0005] Start updating selected client 0007...!
+[Round: 0005] Start updating selected client 0008...!
+[Round: 0005] ...client 0008 is selected and updated (with total sample size: 6000)!
+[Round: 0005] Start updating selected client 0009...!
+[Round: 0005] ...client 0006 is selected and updated (with total sample size: 6000)!
+[Round: 0005] ...client 0007 is selected and updated (with total sample size: 6000)!
+[Round: 0005] ...client 0009 is selected and updated (with total sample size: 6000)!
+[Round: 0005] Evaluate selected 10 clients' models...!
+	[Client 0000] ...finished evaluation!            
+	=> client loss(train): 0.1324            
+	=> client accuracy(train): 96.48%
+
+	[Client 0002] ...finished evaluation!            
+	=> client loss(train): 0.1427            
+	=> client accuracy(train): 95.68%
+
+	[Client 0001] ...finished evaluation!            
+	=> client loss(train): 0.1492            
+	=> client accuracy(train): 95.63%
+
+	[Client 0003] ...finished evaluation!            
+	=> client loss(train): 0.1326            
+	=> client accuracy(train): 96.25%
+
+	[Client 0004] ...finished evaluation!            
+	=> client loss(train): 0.1510            
+	=> client accuracy(train): 95.60%
+
+	[Client 0005] ...finished evaluation!            
+	=> client loss(train): 0.1528            
+	=> client accuracy(train): 95.18%
+
+	[Client 0006] ...finished evaluation!            
+	=> client loss(train): 0.1612            
+	=> client accuracy(train): 95.30%
+
+	[Client 0007] ...finished evaluation!            
+	=> client loss(train): 0.1407            
+	=> client accuracy(train): 95.92%
+
+	[Client 0008] ...finished evaluation!            
+	=> client loss(train): 0.1500            
+	=> client accuracy(train): 95.52%
+
+	[Client 0009] ...finished evaluation!            
+	=> client loss(train): 0.1440            
+	=> client accuracy(train): 95.97%
+
+sampled_client_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[Round: 0005] Aggregate gradients of 10 clients...!
+0it [00:00, ?it/s]1it [00:00,  6.03it/s]2it [00:00,  6.12it/s]3it [00:00,  5.05it/s]4it [00:00,  4.36it/s]5it [00:01,  4.50it/s]6it [00:01,  4.92it/s]7it [00:01,  5.08it/s]8it [00:01,  5.38it/s]9it [00:01,  5.43it/s]10it [00:01,  4.98it/s]                       0it [00:00, ?it/s]1it [00:00,  5.52it/s]2it [00:00,  4.71it/s]3it [00:00,  4.04it/s]4it [00:00,  3.90it/s]5it [00:01,  4.05it/s]6it [00:01,  4.73it/s]7it [00:01,  4.93it/s]8it [00:01,  4.94it/s]9it [00:02,  4.38it/s]10it [00:02,  4.33it/s]                       0it [00:00, ?it/s]1it [00:00,  4.13it/s]2it [00:00,  5.27it/s]3it [00:00,  5.26it/s]4it [00:00,  4.97it/s]5it [00:01,  4.75it/s]6it [00:01,  4.64it/s]7it [00:01,  4.98it/s]8it [00:01,  4.31it/s]10it [00:02,  4.95it/s]                       0it [00:00, ?it/s]1it [00:00,  3.93it/s]2it [00:00,  5.37it/s]3it [00:00,  4.91it/s]4it [00:00,  4.99it/s]5it [00:01,  4.36it/s]6it [00:01,  5.08it/s]7it [00:01,  4.84it/s]8it [00:01,  4.11it/s]9it [00:01,  4.52it/s]10it [00:02,  3.85it/s]                       0it [00:00, ?it/s]1it [00:00,  3.47it/s]2it [00:00,  3.08it/s]3it [00:00,  3.53it/s]4it [00:01,  3.64it/s]5it [00:01,  3.67it/s]6it [00:01,  3.47it/s]7it [00:02,  3.37it/s]8it [00:02,  3.29it/s]9it [00:02,  3.64it/s]10it [00:02,  3.48it/s]                       0it [00:00, ?it/s]1it [00:00,  3.25it/s]2it [00:00,  2.97it/s]3it [00:00,  3.02it/s]4it [00:01,  2.98it/s]5it [00:01,  3.10it/s]6it [00:01,  3.19it/s]7it [00:02,  3.30it/s]8it [00:02,  3.55it/s]9it [00:02,  3.44it/s]10it [00:03,  3.29it/s]                       0it [00:00, ?it/s]1it [00:00,  2.93it/s]2it [00:00,  2.92it/s]3it [00:01,  2.90it/s]4it [00:01,  3.13it/s]5it [00:01,  3.40it/s]6it [00:01,  3.89it/s]7it [00:02,  3.74it/s]8it [00:02,  3.53it/s]9it [00:02,  3.39it/s]10it [00:02,  3.28it/s]                       conv1.weight
+conv2.weight
+fc1.weight
+fc2.weight
+[Round: 0005] ...updated weights of 10 clients are successfully averaged!
+[Round: 0005] Evaluate global model's performance...!                
+	[Server] ...finished evaluation!                
+	=> Loss: 0.1313                
+	=> Accuracy: 96.04%
+
+  0%|          | 0/10 [00:00<?, ?it/s]                                      [Round: 0005] ...successfully transmitted models to all 10 clients!
+...done all learning process!
+...exit program!

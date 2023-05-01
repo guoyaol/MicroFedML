@@ -6,7 +6,7 @@ global_config:
 ---
 data_config:
   data_path: "./data/"
-  dataset_name: "MNIST"
+  dataset_name: "CIFAR10"
   num_shards: 200
   iid: False
 ---
@@ -20,7 +20,7 @@ fed_config:
   optimizer: torch.optim.SGD
 ---
 optim_config:
-  lr: 0.01
+  lr: 0.05
   momentum: 0
 ---
 init_config:
@@ -34,8 +34,8 @@ model_config:
   #num_hiddens: 200
   #num_classes: 10
   
-  name: CNN
-  in_channels: 1
+  name: CNN2
+  in_channels: 3
   hidden_channels: 32
   num_hiddens: 512
   num_classes: 10

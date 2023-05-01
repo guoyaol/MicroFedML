@@ -5,6 +5,7 @@ import pickle
 import yaml
 import threading
 import logging
+import argparse
 
 import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
@@ -59,6 +60,13 @@ if __name__ == "__main__":
         logging.info(config)
     print()
 
+    argparse = argparse.ArgumentParser()
+    argparse.add_argument("--num_server", type=int, default=3)
+
+    args = argparse.parse_args()
+
+    print("currently using {} server(s)".format(args.num_server))
+
     # initialize federated learning
     central_server = Server(
         writer,
@@ -69,6 +77,7 @@ if __name__ == "__main__":
         fed_config,
         optim_config,
         sketch_config,
+        args.num_server,
     )
     central_server.setup()
 
